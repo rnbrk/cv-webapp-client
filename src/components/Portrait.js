@@ -16,14 +16,14 @@ const styles = {
   }
 };
 
-const Portrait = props => (
-  <Box className={props.classes.portrait}>
-    <Avatar alt="My photo" src="/img/profile_photo.jpg" className={props.classes.photo} />
+const Portrait = ({ classes, name, title }) => (
+  <Box className={classes.portrait}>
+    <Avatar alt="My photo" src="/img/profile_photo.jpg" className={classes.photo} />
     <Typography variant="h1" align="center">
-      Ron Broek
+      {name}
     </Typography>
     <Typography variant="subtitle1" align="center" color="primary" gutterBottom>
-      Webdeveloper
+      {title}
     </Typography>
   </Box>
 );

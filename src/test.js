@@ -1,48 +1,58 @@
-// import authContext from './contexts/auth';
-// import Authentication from './components/Authentication';
-// import { login, getCv } from './hooks/requests';
+/**
+ * -------------------------
+ */
 
-// const [credentials, setCredentials] = useState({
-//   email: 'ron@web.dev',
-//   password: '12345abc'
-// });
-// const [refreshToken, setRefreshToken] = useState(null);
-// const [token, setToken] = useState(null);
-// const [user, setUser] = useState(null);
-// const [cvs, setCvs] = useState(null);
-// const [currentCv, setCurrentCv] = useState(null);
+// const [name, setName] = useState('Exercise');
+// const [exercises, setExercises] = useState([
+//   { id: uuid(), title: 'Bench Press' },
+//   { id: uuid(), title: 'Deadlift' },
+//   { id: uuid(), title: 'Squats' }
+// ]);
 
-// useEffect(() => {
-//   const handleLogin = async () => {
-//     try {
-//       const response = await login(credentials);
-//       setRefreshToken(response.data.refreshToken);
-//       setToken(response.data.token);
-//       setUser(response.data.user);
-//       setCvs(response.data.user.cvs);
+// const handleChange = e => {
+//   setName(e.target.value);
+// };
 
-//       console.log(response.data);
-//     } catch (e) {
-//       console.error('Error', e);
-//     }
-//   };
-//   handleLogin();
-// }, []);
+// const handleCreate = e => {
+//   e.preventDefault();
 
-// useEffect(() => {
-//   const handleGetCvs = async () => {
-//     try {
-//       const response = await getCv(cvs[0]._id);
-//       setCurrentCv(response.data);
-//     } catch (e) {
-//       console.error('Error', e);
-//     }
-//   };
-
-//   if (cvs) {
-//     handleGetCvs();
+//   if (name) {
+//     setExercises([
+//       ...exercises,
+//       {
+//         title: name,
+//         id: uuid()
+//       }
+//     ]);
 //   }
-// }, [cvs]);
+// };
 
-// <authContext.Provider value={{ token, refreshToken, user }}>
-// </authContext.Provider>
+// const handleDelete = id => setExercises(exercises.filter(exercise => exercise.id !== id));
+
+// <Paper className={props.classes.paper}>
+// <form onSubmit={handleCreate} className={props.classes.form}>
+//   <TextField
+//     name="title"
+//     label="main"
+//     value={name}
+//     onChange={handleChange}
+//     margin="normal"
+//   />
+
+//   <Button type="submit" color="primary" variant="contained">
+//     Create
+//   </Button>
+// </form>
+// <List>
+//   {exercises.map(({ id, title }) => (
+//     <ListItem key={id}>
+//       <ListItemText primary={title} />
+//       <ListItemSecondaryAction>
+//         <IconButton color="primary" onClick={() => handleDelete(id)}>
+//           <Delete />
+//         </IconButton>
+//       </ListItemSecondaryAction>
+//     </ListItem>
+//   ))}
+// </List>
+// </Paper>

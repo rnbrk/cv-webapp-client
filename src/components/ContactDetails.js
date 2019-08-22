@@ -15,11 +15,11 @@ const styles = {
   }
 };
 
-const ContactDetails = props => (
-  <Grid container className={props.classes.infoBar}>
-    <ContactDetail text={'r.t.broek@hotmail.com'} Icon={AlternateEmail} />
-    <ContactDetail text={'06 46 52 3636'} Icon={LocalPhone} />
-    <ContactDetail text={'www.ronbroek.com'} Icon={LinkIcon} href="https://www.ronbroek.com" />
+const ContactDetails = ({ classes, email, phoneNumber, website }) => (
+  <Grid container className={classes.infoBar}>
+    <ContactDetail text={email} Icon={AlternateEmail} />
+    <ContactDetail text={phoneNumber} Icon={LocalPhone} />
+    <ContactDetail text={website && website.name} Icon={LinkIcon} href={website && website.link} />
   </Grid>
 );
 

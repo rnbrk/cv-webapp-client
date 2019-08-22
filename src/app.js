@@ -1,25 +1,11 @@
-import React, { useState } from 'react';
-import uuid from 'uuid';
-
-import {
-  Avatar,
-  Box,
-  Button,
-  Grid,
-  Paper,
-  TextField,
-  Typography,
-  List,
-  ListItem,
-  ListItemText,
-  ListItemSecondaryAction,
-  IconButton
-} from '@material-ui/core';
-
+import React, { useEffect, useState } from 'react';
 import { withStyles } from '@material-ui/core/styles';
-import { AlternateEmail, Build, Delete, LocalPhone, Link as LinkIcon } from '@material-ui/icons';
+
+import authContext from './contexts/auth';
+import { login, getCv } from './hooks/requests';
 
 import CV from './components/CV';
+import Loading from './components/Loading';
 import SectionProfile from './components/SectionProfile';
 import SectionSkills from './components/SectionSkills';
 
@@ -33,67 +19,72 @@ const styles = theme =>
   };
 
 const App = props => {
-  const [name, setName] = useState('Exercise');
-  const [exercises, setExercises] = useState([
-    { id: uuid(), title: 'Bench Press' },
-    { id: uuid(), title: 'Deadlift' },
-    { id: uuid(), title: 'Squats' }
-  ]);
+  const [credentials, setCredentials] = useState({
+    email: 'ron@web.dev',
+    password: '12345abc'
+  });
+  const [refreshToken, setRefreshToken] = useState(null);
+  const [token, setToken] = useState(null);
+  const [user, setUser] = useState(null);
+  const [cvs, setCvs] = useState(null);
+  const [currentCv, setCurrentCv] = useState(null);
+  const [profile, setProfile] = useState(null);
 
-  const handleChange = e => {
-    setName(e.target.value);
-  };
+  useEffect(() => {
+    const handleLogin = async () => {
+      try {
+        const response = await login(credentials);
+        setRefreshToken(response.data.refreshToken);
+        setToken(response.data.token);
+        setUser(response.data.user);
+        setCvs(response.data.user.cvs);
+      } catch (e) {
+        console.error('Error', e);
+      }
+    };
+    handleLogin();
+  }, []);
 
-  const handleCreate = e => {
-    e.preventDefault();
+  useEffect(() => {
+    const handleGetCvs = async () => {
+      try {
+        const response = await getCv(cvs[0]._id);
+        setCurrentCv(response.data);
 
-    if (name) {
-      setExercises([
-        ...exercises,
-        {
-          title: name,
-          id: uuid()
-        }
-      ]);
+        const profileData = {
+          ...response.data.profile,
+          email: user.email,
+          fullName: user.fullName,
+          phoneNumber: user.phoneNumber,
+          profession: user.profession,
+          website: user.website
+        };
+
+        console.log(profileData);
+
+        setProfile(profileData);
+      } catch (e) {
+        console.error('Error', e);
+      }
+    };
+
+    if (cvs) {
+      handleGetCvs();
     }
-  };
+  }, [cvs]);
 
-  const handleDelete = id => setExercises(exercises.filter(exercise => exercise.id !== id));
+  if (profile) {
+    return (
+      <authContext.Provider value={{ token, refreshToken, user }}>
+        <CV>
+          <SectionProfile profile={profile} />
+          <SectionSkills />
+        </CV>
+      </authContext.Provider>
+    );
+  }
 
-  return (
-    <CV>
-      <SectionProfile />
-      <SectionSkills />
-
-      <Paper className={props.classes.paper}>
-        <form onSubmit={handleCreate} className={props.classes.form}>
-          <TextField
-            name="title"
-            label="main"
-            value={name}
-            onChange={handleChange}
-            margin="normal"
-          />
-
-          <Button type="submit" color="primary" variant="contained">
-            Create
-          </Button>
-        </form>
-        <List>
-          {exercises.map(({ id, title }) => (
-            <ListItem key={id}>
-              <ListItemText primary={title} />
-              <ListItemSecondaryAction>
-                <IconButton color="primary" onClick={() => handleDelete(id)}>
-                  <Delete />
-                </IconButton>
-              </ListItemSecondaryAction>
-            </ListItem>
-          ))}
-        </List>
-      </Paper>
-    </CV>
-  );
+  return <Loading />;
 };
 
 export default withStyles(styles)(App);

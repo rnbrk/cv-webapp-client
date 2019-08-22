@@ -1,7 +1,8 @@
 import React from 'react';
-import { Avatar, Box, Typography } from '@material-ui/core';
+import { Typography } from '@material-ui/core';
 import { withStyles } from '@material-ui/core/styles';
 
+import AboutMe from './AboutMe';
 import StyledPaper from './StyledPaper';
 import ContactDetails from './ContactDetails';
 import Portrait from './Portrait';
@@ -16,15 +17,15 @@ const styles = {
   }
 };
 
-const SectionProfile = props => (
+const SectionProfile = ({ profile }) => (
   <StyledPaper>
-    <ContactDetails />
-    <Portrait />
-
-    <Typography variant="body1" align="center" className={props.classes.aboutme} gutterBottom>
-      Minantia non modo formaeque in meis acervo formaeque gravitate erat indigestaque habentia fixo
-      mutatas aliud orbis retinebat qui non alta
-    </Typography>
+    <ContactDetails
+      email={profile.email}
+      phoneNumber={profile.phoneNumber}
+      website={profile.website}
+    />
+    <Portrait name={profile.fullName} title={profile && profile.profession} />
+    <AboutMe paragraph={profile.paragraph} />
   </StyledPaper>
 );
 
