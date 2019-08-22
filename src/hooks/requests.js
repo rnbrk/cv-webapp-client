@@ -11,4 +11,6 @@ const makeRequest = async (resource, method, data) =>
 
 const login = async credentials => await makeRequest('/users/login', 'post', credentials);
 
-export { login };
+const getCv = async id => await makeRequest(`/cvs/${id}`, 'get');
+
+export { login, getCv };

@@ -9,7 +9,7 @@ const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 
 module.exports = {
   mode: 'development',
-  entry: './src/app.js',
+  entry: './src/index.js',
   output: {
     path: path.resolve(__dirname, 'public', 'dist'),
     filename: 'bundle.js'
@@ -46,8 +46,32 @@ module.exports = {
             }
           }
         ]
+      },
+
+      {
+        test: /\.(woff(2)?|ttf|eot|svg)(\?v=\d+\.\d+\.\d+)?$/,
+        use: [
+          {
+            loader: 'file-loader',
+            options: {
+              name: '[name].[ext]',
+              outputPath: 'fonts/'
+            }
+          }
+        ]
       }
     ]
   },
-  plugins: [new MiniCssExtractPlugin({ filename: 'bundle.css' })]
+  plugins: [new MiniCssExtractPlugin({ filename: 'bundle.css' })],
+  optimization: {
+    splitChunks: {
+      cacheGroups: {
+        commons: {
+          test: /[\\/]node_modules[\\/]/,
+          name: 'dependencies',
+          chunks: 'all'
+        }
+      }
+    }
+  }
 };

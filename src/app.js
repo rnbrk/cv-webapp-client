@@ -1,44 +1,99 @@
-import React, { useEffect, useState } from 'react';
-import ReactDOM from 'react-dom';
-import 'normalize.css/normalize.css';
-import './scss/styles.scss';
+import React, { useState } from 'react';
+import uuid from 'uuid';
 
-import axios from 'axios';
+import {
+  Avatar,
+  Box,
+  Button,
+  Grid,
+  Paper,
+  TextField,
+  Typography,
+  List,
+  ListItem,
+  ListItemText,
+  ListItemSecondaryAction,
+  IconButton
+} from '@material-ui/core';
 
-import authContext from './contexts/auth';
-import Authentication from './components/Authentication';
-import { login } from './hooks/useAuthHandler';
+import { withStyles } from '@material-ui/core/styles';
+import { AlternateEmail, Build, Delete, LocalPhone, Link as LinkIcon } from '@material-ui/icons';
 
-const App = () => {
-  const [credentials, setCredentials] = useState({
-    email: 'ron@web.dev',
-    password: '12345abc'
-  });
-  const [refreshToken, setRefreshToken] = useState(null);
-  const [token, setToken] = useState(null);
-  const [user, setUser] = useState(null);
+import CV from './components/CV';
+import SectionProfile from './components/SectionProfile';
+import SectionSkills from './components/SectionSkills';
 
-  const [data, setData] = useState(null);
+const styles = theme =>
+  console.log(theme) || {
+    form: { display: 'flex', alignItems: 'baseline', justifyContent: 'space-evenly' },
+    paper: {
+      padding: 64,
+      margin: 16
+    }
+  };
 
-  useEffect(() => {
-    const useAuthHandler = async () => {
-      const response = await login(credentials);
-      setRefreshToken(response.data.refreshToken);
-      setToken(response.data.token);
-      setUser(response.data.user);
+const App = props => {
+  const [name, setName] = useState('Exercise');
+  const [exercises, setExercises] = useState([
+    { id: uuid(), title: 'Bench Press' },
+    { id: uuid(), title: 'Deadlift' },
+    { id: uuid(), title: 'Squats' }
+  ]);
 
-      console.log(response.data);
-    };
-    useAuthHandler();
-  }, []);
+  const handleChange = e => {
+    setName(e.target.value);
+  };
+
+  const handleCreate = e => {
+    e.preventDefault();
+
+    if (name) {
+      setExercises([
+        ...exercises,
+        {
+          title: name,
+          id: uuid()
+        }
+      ]);
+    }
+  };
+
+  const handleDelete = id => setExercises(exercises.filter(exercise => exercise.id !== id));
 
   return (
-    <authContext.Provider value={{ token, refreshToken, user }}>
-      <Authentication />
-    </authContext.Provider>
+    <CV>
+      <SectionProfile />
+      <SectionSkills />
+
+      <Paper className={props.classes.paper}>
+        <form onSubmit={handleCreate} className={props.classes.form}>
+          <TextField
+            name="title"
+            label="main"
+            value={name}
+            onChange={handleChange}
+            margin="normal"
+          />
+
+          <Button type="submit" color="primary" variant="contained">
+            Create
+          </Button>
+        </form>
+        <List>
+          {exercises.map(({ id, title }) => (
+            <ListItem key={id}>
+              <ListItemText primary={title} />
+              <ListItemSecondaryAction>
+                <IconButton color="primary" onClick={() => handleDelete(id)}>
+                  <Delete />
+                </IconButton>
+              </ListItemSecondaryAction>
+            </ListItem>
+          ))}
+        </List>
+      </Paper>
+    </CV>
   );
 };
 
-const appElem = document.querySelector('.app');
-
-ReactDOM.render(<App />, appElem);
+export default withStyles(styles)(App);
