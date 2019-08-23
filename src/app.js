@@ -7,7 +7,7 @@ import { login, getCv, getPhoto } from './hooks/requests';
 import CV from './components/CV';
 import Loading from './components/Loading';
 import SectionProfile from './components/SectionProfile';
-import SectionSkills from './components/SectionSkills';
+import SectionJobs from './components/SectionJobs';
 
 const styles = theme =>
   console.log(theme) || {
@@ -29,6 +29,7 @@ const App = props => {
   const [cvs, setCvs] = useState(null);
   const [currentCv, setCurrentCv] = useState(null);
   const [profile, setProfile] = useState(null);
+  const [jobs, setJobs] = useState(null);
   const [photo, setPhoto] = useState(null);
 
   useEffect(() => {
@@ -63,6 +64,10 @@ const App = props => {
         };
 
         setProfile(profileData);
+
+        const jobsData = response.data.jobs;
+        console.log(jobsData);
+        setJobs(jobsData);
       } catch (e) {
         console.error('Error', e);
       }
@@ -84,12 +89,12 @@ const App = props => {
     handleGetPhoto();
   }, [user, photo]);
 
-  if (profile) {
+  if (jobs) {
     return (
       <authContext.Provider value={{ token, refreshToken, user }}>
         <CV>
           <SectionProfile profile={profile} photo={photo} />
-          <SectionSkills />
+          <SectionJobs jobs={jobs} />
         </CV>
       </authContext.Provider>
     );
