@@ -13,9 +13,13 @@ const styles = {
 };
 
 const AboutMe = ({ classes, paragraph }) => (
-  <Typography variant="body1" align="center" className={classes.aboutme} gutterBottom>
-    {paragraph}
-  </Typography>
+  <>
+    {paragraph && (
+      <Typography variant="body1" align="center" className={classes.aboutme} gutterBottom>
+        {paragraph}
+      </Typography>
+    )}
+  </>
 );
 
 export default withStyles(styles)(AboutMe);

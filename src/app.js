@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { withStyles } from '@material-ui/core/styles';
 
 import authContext from './contexts/auth';
-import { login, getCv } from './hooks/requests';
+import { login, getCv, getPhoto } from './hooks/requests';
 
 import CV from './components/CV';
 import Loading from './components/Loading';
@@ -29,6 +29,7 @@ const App = props => {
   const [cvs, setCvs] = useState(null);
   const [currentCv, setCurrentCv] = useState(null);
   const [profile, setProfile] = useState(null);
+  const [photo, setPhoto] = useState(null);
 
   useEffect(() => {
     const handleLogin = async () => {
@@ -53,14 +54,13 @@ const App = props => {
 
         const profileData = {
           ...response.data.profile,
+          _id: user._id,
           email: user.email,
           fullName: user.fullName,
           phoneNumber: user.phoneNumber,
           profession: user.profession,
           website: user.website
         };
-
-        console.log(profileData);
 
         setProfile(profileData);
       } catch (e) {
@@ -73,11 +73,22 @@ const App = props => {
     }
   }, [cvs]);
 
+  useEffect(() => {
+    const handleGetPhoto = async () => {
+      if (user && !photo) {
+        const url = await getPhoto(user._id);
+        setPhoto(url);
+      }
+    };
+
+    handleGetPhoto();
+  }, [user, photo]);
+
   if (profile) {
     return (
       <authContext.Provider value={{ token, refreshToken, user }}>
         <CV>
-          <SectionProfile profile={profile} />
+          <SectionProfile profile={profile} photo={photo} />
           <SectionSkills />
         </CV>
       </authContext.Provider>

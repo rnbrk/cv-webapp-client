@@ -1,5 +1,6 @@
 import React from 'react';
 import { Avatar, Box, Typography } from '@material-ui/core';
+import { AccountCircle } from '@material-ui/icons';
 import { withStyles } from '@material-ui/core/styles';
 
 const styles = {
@@ -13,18 +14,34 @@ const styles = {
     marginBottom: 16,
     width: 120,
     height: 120
+  },
+  default: {
+    display: 'block',
+    margin: '0 auto',
+    marginBottom: 16,
+    fontSize: 120
   }
 };
 
-const Portrait = ({ classes, name, title }) => (
+const Portrait = ({ classes, name, title, photo }) => (
   <Box className={classes.portrait}>
-    <Avatar alt="My photo" src="/img/profile_photo.jpg" className={classes.photo} />
-    <Typography variant="h1" align="center">
-      {name}
-    </Typography>
-    <Typography variant="subtitle1" align="center" color="primary" gutterBottom>
-      {title}
-    </Typography>
+    {photo ? (
+      <Avatar alt="My photo" src={photo} className={classes.photo} />
+    ) : (
+      <AccountCircle className={classes.default} color="primary" />
+    )}
+
+    {name && (
+      <Typography variant="h1" align="center">
+        {name}
+      </Typography>
+    )}
+
+    {title && (
+      <Typography variant="subtitle1" align="center" color="primary" gutterBottom>
+        {title}
+      </Typography>
+    )}
   </Box>
 );
 

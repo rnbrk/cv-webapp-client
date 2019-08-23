@@ -1,5 +1,4 @@
 import React from 'react';
-import { Typography } from '@material-ui/core';
 import { withStyles } from '@material-ui/core/styles';
 
 import AboutMe from './AboutMe';
@@ -17,14 +16,14 @@ const styles = {
   }
 };
 
-const SectionProfile = ({ profile }) => (
+const SectionProfile = ({ profile, photo }) => (
   <StyledPaper>
     <ContactDetails
       email={profile.email}
       phoneNumber={profile.phoneNumber}
       website={profile.website}
     />
-    <Portrait name={profile.fullName} title={profile && profile.profession} />
+    <Portrait name={profile.fullName} title={profile.profession} _id={profile._id} photo={photo} />
     <AboutMe paragraph={profile.paragraph} />
   </StyledPaper>
 );

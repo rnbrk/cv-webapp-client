@@ -17,9 +17,15 @@ const styles = {
 
 const ContactDetails = ({ classes, email, phoneNumber, website }) => (
   <Grid container className={classes.infoBar}>
-    <ContactDetail text={email} Icon={AlternateEmail} />
-    <ContactDetail text={phoneNumber} Icon={LocalPhone} />
-    <ContactDetail text={website && website.name} Icon={LinkIcon} href={website && website.link} />
+    {email && <ContactDetail text={email} Icon={AlternateEmail} />}
+    {phoneNumber && <ContactDetail text={phoneNumber} Icon={LocalPhone} />}
+    {website && (
+      <ContactDetail
+        text={website && website.name}
+        Icon={LinkIcon}
+        href={website && website.link}
+      />
+    )}
   </Grid>
 );
 
