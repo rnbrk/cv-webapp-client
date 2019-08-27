@@ -10,10 +10,9 @@ const ListItemJobs = ({ array }) => (
       const olderJob = array[i + 1];
 
       const timelineStyles = {};
-      debugger;
       if (newerJob) {
         if (moment(job.endDate).isBefore(newerJob.startDate, 'month')) {
-          timelineStyles.topDivider = true;
+          timelineStyles.topStyle = 'divider';
         }
 
         if (moment(job.endDate).isSame(newerJob.startDate, 'month')) {
@@ -23,7 +22,7 @@ const ListItemJobs = ({ array }) => (
 
       if (olderJob) {
         if (moment(job.startDate).isAfter(olderJob.endDate, 'month')) {
-          timelineStyles.bottomDivider = true;
+          timelineStyles.bottomStyle = 'divider';
         }
       }
 

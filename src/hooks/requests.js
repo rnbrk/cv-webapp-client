@@ -13,6 +13,11 @@ const login = async credentials => await makeRequest('/users/login', 'post', cre
 
 const getCv = async id => await makeRequest(`/cvs/${id}`, 'get');
 
+const getCv2 = async => await axios({
+  url: `${DOMAIN}/cvs/${id}`,
+  'get'
+});
+
 const getPhoto = async id => {
   try {
     const response = await axios({

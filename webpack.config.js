@@ -20,7 +20,7 @@ module.exports = {
     open: false,
     writeToDisk: true
   },
-  devtool: 'inline-source-map',
+  devtool: 'cheap-module-eval-source-map',
   module: {
     rules: [
       {

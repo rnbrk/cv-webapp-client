@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef } from 'react';
 import moment from 'moment';
 
 import { Box, Grid, Typography } from '@material-ui/core';
@@ -7,7 +7,7 @@ import { withStyles } from '@material-ui/core/styles';
 import { dotMixin, moveUpMixin, centerMixin } from '../styles/mixins';
 import TimelineDivider from './TimelineDivider';
 
-const DIVIDER_HEIGHT = 5;
+const DIVIDER_HEIGHT = 7;
 
 const styles = {
   timelineGrid: {
@@ -19,10 +19,10 @@ const styles = {
     height: props => {
       let height = 100;
 
-      if (props.topDivider) {
+      if (props.topStyle === 'unconnected' || props.topStyle === 'divider') {
         height -= DIVIDER_HEIGHT;
       }
-      if (props.bottomDivider) {
+      if (props.bottomStyle === 'unconnected' || props.bottomStyle === 'divider') {
         height -= DIVIDER_HEIGHT;
       }
 
@@ -51,8 +51,9 @@ const styles = {
     textAlign: 'right',
     whiteSpace: 'nowrap',
     position: 'absolute',
-    left: '50%',
-    transform: 'translate(-110%, -50%)'
+    transform: 'translate(-100%, -50%)',
+    left: '100%',
+    paddingRight: 12
   },
   timelineTextTop: { top: '0%' },
   timelineTextBottom: { top: '100%' }
@@ -64,8 +65,9 @@ const Timeline = ({
   classes,
   omitStartDate,
   omitEndDate,
-  topDivider,
-  bottomDivider
+  topStyle = 'connected',
+  bottomStyle = 'connected',
+  dateFormat = 'MMMM YYYY'
 }) => (
   <Grid
     item
@@ -76,7 +78,7 @@ const Timeline = ({
     alignItems="center"
     className={classes.timelineGrid}
   >
-    {topDivider && <TimelineDivider height={`${DIVIDER_HEIGHT}%`} />}
+    {topStyle == 'divider' && <TimelineDivider height={`${DIVIDER_HEIGHT}%`} />}
 
     <Box className={classes.timeline}>
       {!omitEndDate && (
@@ -85,7 +87,7 @@ const Timeline = ({
           align="right"
           className={`${classes.timelineText} ${classes.timelineTextTop}`}
         >
-          {moment(endDate).format('MMMM YYYY')}
+          {moment(endDate).format(dateFormat)}
         </Typography>
       )}
 
@@ -95,12 +97,12 @@ const Timeline = ({
           align="right"
           className={`${classes.timelineText} ${classes.timelineTextBottom}`}
         >
-          {moment(startDate).format('MMMM YYYY')}
+          {moment(startDate).format(dateFormat)}
         </Typography>
       )}
     </Box>
 
-    {bottomDivider && <TimelineDivider height={`${DIVIDER_HEIGHT}%`} />}
+    {bottomStyle === 'divider' && <TimelineDivider height={`${DIVIDER_HEIGHT}%`} />}
   </Grid>
 );
 

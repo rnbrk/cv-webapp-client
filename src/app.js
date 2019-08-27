@@ -1,13 +1,19 @@
 import React, { useEffect, useState } from 'react';
+import axios from 'axios';
 import { withStyles } from '@material-ui/core/styles';
+import { Box, Button } from '@material-ui/core';
 
-import authContext from './contexts/auth';
-import { login, getCv, getPhoto } from './hooks/requests';
+import useAuthHandler from './hooks/useAuthHandler';
+import useFileLoader from './hooks/useFileLoader';
 
 import CV from './components/CV';
 import Loading from './components/Loading';
 import SectionProfile from './components/SectionProfile';
 import SectionJobs from './components/SectionJobs';
+import SectionStudies from './components/SectionStudies';
+import SectionCourses from './components/SectionCourses';
+
+const DOMAIN = `http://localhost:3000`;
 
 const styles = theme =>
   console.log(theme) || {
@@ -19,86 +25,96 @@ const styles = theme =>
   };
 
 const App = props => {
-  const [credentials, setCredentials] = useState({
-    email: 'ron@web.dev',
-    password: '12345abc'
-  });
-  const [refreshToken, setRefreshToken] = useState(null);
-  const [token, setToken] = useState(null);
-  const [user, setUser] = useState(null);
-  const [cvs, setCvs] = useState(null);
   const [currentCv, setCurrentCv] = useState(null);
   const [profile, setProfile] = useState(null);
   const [jobs, setJobs] = useState(null);
-  const [photo, setPhoto] = useState(null);
+  const [studies, setStudies] = useState(null);
+  const [courses, setCourses] = useState(null);
 
-  useEffect(() => {
-    const handleLogin = async () => {
-      try {
-        const response = await login(credentials);
-        setRefreshToken(response.data.refreshToken);
-        setToken(response.data.token);
-        setUser(response.data.user);
-        setCvs(response.data.user.cvs);
-      } catch (e) {
-        console.error('Error', e);
-      }
-    };
-    handleLogin();
-  }, []);
+  const { userProfile, auth, cvs } = useAuthHandler(`${DOMAIN}/users/login`, {
+    email: 'ron@web.dev',
+    password: '12345abc'
+  });
 
-  useEffect(() => {
-    const handleGetCvs = async () => {
-      try {
-        const response = await getCv(cvs[0]._id);
-        setCurrentCv(response.data);
+  const handleGetCvs = async () => {
+    try {
+      console.log(userProfile);
+      const response = await axios({
+        url: `${DOMAIN}/cvs/${userProfile.cvs[0]._id}`,
+        method: 'get'
+      });
 
-        const profileData = {
-          ...response.data.profile,
-          _id: user._id,
-          email: user.email,
-          fullName: user.fullName,
-          phoneNumber: user.phoneNumber,
-          profession: user.profession,
-          website: user.website
-        };
+      setCurrentCv(response.data);
 
-        setProfile(profileData);
+      const profileData = {
+        ...response.data.profile,
+        ...userProfile
+      };
 
-        const jobsData = response.data.jobs;
-        console.log(jobsData);
-        setJobs(jobsData);
-      } catch (e) {
-        console.error('Error', e);
-      }
-    };
-
-    if (cvs) {
-      handleGetCvs();
+      setProfile(profileData);
+      setJobs(response.data.jobs);
+      setStudies(response.data.studies);
+      setCourses(response.data.courses);
+      console.log(response.data);
+    } catch (e) {
+      console.error('Error', e);
     }
-  }, [cvs]);
+  };
 
-  useEffect(() => {
-    const handleGetPhoto = async () => {
-      if (user && !photo) {
-        const url = await getPhoto(user._id);
-        setPhoto(url);
-      }
-    };
+  const photo = useFileLoader(`${DOMAIN}/users/${auth._id}/photo`);
 
-    handleGetPhoto();
-  }, [user, photo]);
+  return (
+    <main>
+      <Box>
+        <Button variant="contained" onClick={auth.login}>
+          Log in
+        </Button>
 
-  if (jobs) {
-    return (
-      <authContext.Provider value={{ token, refreshToken, user }}>
+        <Button variant="contained" onClick={auth.logout}>
+          Log out
+        </Button>
+
+        <Button variant="contained" onClick={auth.createAccount}>
+          Create new account
+        </Button>
+
+        <Button variant="contained" onClick={auth.deleteAccount}>
+          Delete account
+        </Button>
+
+        <Button
+          variant="contained"
+          onClick={() => {
+            auth.updateAccount({
+              firstName: 'Luke',
+              lastName: 'Skywalker'
+            });
+          }}
+        >
+          Update account
+        </Button>
+
+        <Button variant="contained" onClick={auth.getToken}>
+          Get token
+        </Button>
+      </Box>
+
+      <Box>
+        <Button variant="contained" color="secondary" onClick={handleGetCvs}>
+          Get CVs
+        </Button>
+      </Box>
+
+      {jobs && (
         <CV>
-          <SectionProfile profile={profile} photo={photo} />
+          <SectionProfile profile={profile} photo={photo.file} />
           <SectionJobs jobs={jobs} />
+          <SectionStudies studies={studies} />
+          <SectionCourses courses={courses} />
         </CV>
-      </authContext.Provider>
-    );
-  }
+      )}
+    </main>
+  );
 
   return <Loading />;
 };
