@@ -1,7 +1,9 @@
 import React from 'react';
 
-import { Grid, Link, Typography } from '@material-ui/core';
-import { AlternateEmail, LocalPhone, Link as LinkIcon } from '@material-ui/icons';
+import Grid from '@material-ui/core/Grid';
+import AlternateEmail from '@material-ui/icons/AlternateEmail';
+import LocalPhone from '@material-ui/icons/LocalPhone';
+import Link from '@material-ui/icons/Link';
 import { withStyles } from '@material-ui/core/styles';
 
 import ContactDetail from './ContactDetail';

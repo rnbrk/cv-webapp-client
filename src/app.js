@@ -1,7 +1,8 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import axios from 'axios';
 import { withStyles } from '@material-ui/core/styles';
-import { Box, Button } from '@material-ui/core';
+import Box from '@material-ui/core/Box';
+import Button from '@material-ui/core/Button';
 
 import useAuthHandler from './hooks/useAuthHandler';
 import useFileLoader from './hooks/useFileLoader';
@@ -24,7 +25,7 @@ const styles = theme =>
     }
   };
 
-const App = props => {
+const App = () => {
   const [currentCv, setCurrentCv] = useState(null);
   const [profile, setProfile] = useState(null);
   const [jobs, setJobs] = useState(null);
@@ -61,7 +62,7 @@ const App = props => {
     }
   };
 
-  const photo = useFileLoader(`${DOMAIN}/users/${auth._id}/photo`);
+  const photo = useFileLoader(DOMAIN);
 
   return (
     <main>
@@ -105,18 +106,40 @@ const App = props => {
         </Button>
       </Box>
 
-      {jobs && (
+      <Box>
+        <Button
+          variant="contained"
+          onClick={() => {
+            photo.get(`/users/${auth._id}/photo`);
+          }}
+        >
+          Get photo
+        </Button>
+
+        <Button
+          variant="contained"
+          onClick={async () => {
+            const token = await auth.getToken();
+            console.log(token);
+            photo.delete(`/users/photo`, token);
+          }}
+        >
+          Delete photo
+        </Button>
+      </Box>
+
+      {jobs ? (
         <CV>
           <SectionProfile profile={profile} photo={photo.file} />
           <SectionJobs jobs={jobs} />
           <SectionStudies studies={studies} />
           <SectionCourses courses={courses} />
         </CV>
+      ) : (
+        <Loading />
       )}
     </main>
   );
-
-  return <Loading />;
 };
 
 export default withStyles(styles)(App);

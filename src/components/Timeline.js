@@ -1,7 +1,9 @@
 import React, { useRef } from 'react';
 import moment from 'moment';
 
-import { Box, Grid, Typography } from '@material-ui/core';
+import Box from '@material-ui/core/Box';
+import Grid from '@material-ui/core/Grid';
+import Typography from '@material-ui/core/Typography';
 import { withStyles } from '@material-ui/core/styles';
 
 import { dotMixin, moveUpMixin, centerMixin } from '../styles/mixins';

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Build } from '@material-ui/icons';
+import Build from '@material-ui/icons/Build';
 
 import StyledPaper from './StyledPaper';
 import TitleSection from './TitleSection';

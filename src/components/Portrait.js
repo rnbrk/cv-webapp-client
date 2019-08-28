@@ -1,6 +1,8 @@
 import React from 'react';
-import { Avatar, Box, Typography } from '@material-ui/core';
-import { AccountCircle } from '@material-ui/icons';
+import Avatar from '@material-ui/core/Avatar';
+import Box from '@material-ui/core/Box';
+import Typography from '@material-ui/core/Typography';
+import AccountCircle from '@material-ui/icons/AccountCircle';
 import { withStyles } from '@material-ui/core/styles';
 
 const styles = {

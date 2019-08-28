@@ -1,9 +1,10 @@
 import React from 'react';
 
-import { Box, Grid } from '@material-ui/core';
+import Box from '@material-ui/core/Box';
+import Grid from '@material-ui/core/Grid';
 import { withStyles } from '@material-ui/core/styles';
 
-import { dotMixin, centerMixin } from '../styles/mixins';
+import { dotMixin } from '../styles/mixins';
 
 const styles = {
   grid: {

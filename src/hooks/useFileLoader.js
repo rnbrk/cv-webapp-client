@@ -1,22 +1,41 @@
 import { useState } from 'react';
 import axios from 'axios';
 
-const useFileLoader = url => {
+const useFileLoader = baseURL => {
   const [file, setFile] = useState(null);
+  const instance = axios.create({ baseURL, timeout: 5000 });
 
-  const getFile = async () => {
-    const response = await axios({
-      url,
-      method: 'get',
-      responseType: 'blob'
-    });
-    const blob = window.URL.createObjectURL(new Blob([response.data]));
-    setFile(blob);
+  const getFile = async url => {
+    try {
+      const response = await instance({
+        url,
+        responseType: 'blob'
+      });
+      const blob = window.URL.createObjectURL(new Blob([response.data]));
+      setFile(blob);
+    } catch (e) {
+      console.error(`Could not get file from ${baseURL}${url}`);
+    }
+  };
+
+  const deleteFile = async (url, token) => {
+    try {
+      await instance({
+        url,
+        method: 'delete',
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setFile(null);
+    } catch (e) {
+      console.error(e);
+      // console.error(`Could not delete file from ${baseURL}${url}`);
+    }
   };
 
   return {
     file,
-    get: getFile
+    get: getFile,
+    delete: deleteFile
   };
 };
 

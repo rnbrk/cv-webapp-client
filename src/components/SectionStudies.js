@@ -1,6 +1,6 @@
 import React from 'react';
 import uuid from 'uuid';
-import { School } from '@material-ui/icons';
+import School from '@material-ui/icons/School';
 
 import StyledPaper from './StyledPaper';
 import TitleSection from './TitleSection';

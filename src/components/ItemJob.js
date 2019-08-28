@@ -1,8 +1,12 @@
 import React from 'react';
 import uuid from 'uuid';
 
-import { Grid, List, ListItem, ListItemText, Divider, Typography } from '@material-ui/core';
-import { Check } from '@material-ui/icons';
+import Grid from '@material-ui/core/Grid';
+import List from '@material-ui/core/List';
+import ListItem from '@material-ui/core/ListItem';
+import ListItemText from '@material-ui/core/ListItemText';
+import Typography from '@material-ui/core/Typography';
+import Check from '@material-ui/icons/Check';
 import { withStyles } from '@material-ui/core/styles';
 
 import TitleItem from './TitleItem';

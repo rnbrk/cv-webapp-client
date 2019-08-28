@@ -38,11 +38,15 @@ function useAuthHandler(url = `${DOMAIN}/users/login`, credentials) {
 
   async function logout() {
     try {
-      const response = await axios({
+      const payload = {
         url: `${DOMAIN}/users/logout`,
         method: 'post',
         headers: { Authorization: `Bearer ${auth.token}` }
-      });
+      };
+
+      console.log(payload);
+
+      const response = await axios(payload);
       setAuth(null);
 
       console.log(response.status, response.data);
@@ -140,17 +144,19 @@ function useAuthHandler(url = `${DOMAIN}/users/login`, credentials) {
     let token = auth.token;
 
     if (_isValid(auth.token)) {
-      console.log(`Token is valid. Here's ya token: ${auth.token}`);
+      // console.log(`Token is valid. Here's ya token: ${auth.token}`);
       token = auth.token;
     }
 
     if (!_isValid(auth.token) && _isValid(auth.refreshToken)) {
-      console.log(
-        `Token ${auth.token} is not valid, but refreshToken ${auth.refreshToken} is. Refreshing access token...`
-      );
+      // console.log(
+      // `Token ${auth.token} is not valid, but refreshToken ${auth.refreshToken} is. Refreshing access token...`
+      // );
       token = await _refreshAccessToken();
-      console.log(`Here's ya token: ${token}`);
-    } else {
+      // console.log(`Here's ya token: ${token}`);
+    }
+
+    if (!_isValid(auth.refreshToken)) {
       token = null;
     }
 

@@ -4,10 +4,27 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "jest",
     "watch": "webpack --watch",
     "start": "webpack-dev-server",
-    "stop-linux": "killall node"
+    "stop-linux": "killall node",
+    "jestsucks": "jest --transformIgnorePatterns \"node_modules/(?!material-ui-next-pickers)/\" --env=jsdom"
+  },
+  "jest": {
+    "setupFiles": [
+      "<rootDir>/src/tests/setupTests.js"
+    ],
+    "testEnvironment": "jsdom",
+    "snapshotSerializers": [
+      "enzyme-to-json/serializer"
+    ],
+    "transform": {
+      "^.+\\.js$": "babel-jest",
+      "^.+\\.jsx$": "babel-jest"
+    },
+    "transformIgnorePatterns": [
+      "node_modules/(?!(@material-ui)/)"
+    ]
   },
   "keywords": [],
   "author": "",
@@ -33,6 +50,7 @@
     "@babel/preset-env": "^7.5.5",
     "@babel/preset-react": "^7.0.0",
     "babel-eslint": "^10.0.2",
+    "babel-jest": "^24.9.0",
     "babel-loader": "^8.0.6",
     "babel-plugin-transform-imports": "^2.0.0",
     "css-loader": "^3.2.0",
