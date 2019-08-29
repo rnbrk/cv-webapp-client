@@ -22,11 +22,7 @@ const ContactDetails = ({ classes, email, phoneNumber, website }) => (
     {email && <ContactDetail text={email} Icon={AlternateEmail} />}
     {phoneNumber && <ContactDetail text={phoneNumber} Icon={LocalPhone} />}
     {website && (
-      <ContactDetail
-        text={website && website.name}
-        Icon={LinkIcon}
-        href={website && website.link}
-      />
+      <ContactDetail text={website && website.name} Icon={Link} href={website && website.link} />
     )}
   </Grid>
 );

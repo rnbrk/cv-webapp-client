@@ -4,11 +4,11 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "jest",
+    "test": "jest --watch ",
     "watch": "webpack --watch",
     "start": "webpack-dev-server",
     "stop-linux": "killall node",
-    "jestsucks": "jest --transformIgnorePatterns \"node_modules/(?!material-ui-next-pickers)/\" --env=jsdom"
+    "jesttransform": "jest --transformIgnorePatterns \"node_modules/(?!material-ui-next-pickers)/\" --env=jsdom"
   },
   "jest": {
     "setupFiles": [
@@ -24,6 +24,10 @@
     },
     "transformIgnorePatterns": [
       "node_modules/(?!(@material-ui)/)"
+    ],
+    "collectCoverage": true,
+    "collectCoverageFrom": [
+      "src/**/*.{js,jsx}"
     ]
   },
   "keywords": [],
@@ -53,6 +57,7 @@
     "babel-jest": "^24.9.0",
     "babel-loader": "^8.0.6",
     "babel-plugin-transform-imports": "^2.0.0",
+    "check-prop-types": "^1.1.2",
     "css-loader": "^3.2.0",
     "enzyme": "^3.10.0",
     "enzyme-adapter-react-16": "^1.14.0",

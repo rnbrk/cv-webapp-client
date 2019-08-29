@@ -26,11 +26,11 @@ const styles = theme =>
   };
 
 const App = () => {
-  const [currentCv, setCurrentCv] = useState(null);
-  const [profile, setProfile] = useState(null);
-  const [jobs, setJobs] = useState(null);
-  const [studies, setStudies] = useState(null);
-  const [courses, setCourses] = useState(null);
+  const [currentCv, setCurrentCv] = useState(undefined);
+  const [profile, setProfile] = useState(undefined);
+  const [jobs, setJobs] = useState(undefined);
+  const [studies, setStudies] = useState(undefined);
+  const [courses, setCourses] = useState(undefined);
 
   const { userProfile, auth, cvs } = useAuthHandler(`${DOMAIN}/users/login`, {
     email: 'ron@web.dev',
@@ -39,7 +39,6 @@ const App = () => {
 
   const handleGetCvs = async () => {
     try {
-      console.log(userProfile);
       const response = await axios({
         url: `${DOMAIN}/cvs/${userProfile.cvs[0]._id}`,
         method: 'get'
@@ -52,11 +51,12 @@ const App = () => {
         ...userProfile
       };
 
+      console.log('studies', response.data.studies);
+
       setProfile(profileData);
       setJobs(response.data.jobs);
       setStudies(response.data.studies);
       setCourses(response.data.courses);
-      console.log(response.data);
     } catch (e) {
       console.error('Error', e);
     }

@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import Build from '@material-ui/icons/Build';
 
 import StyledPaper from './StyledPaper';
@@ -14,5 +15,13 @@ const SectionJobs = ({ jobs }) => (
     </StyledPaper>
   </section>
 );
+
+SectionJobs.propTypes = {
+  jobs: PropTypes.object.isRequired
+};
+
+SectionJobs.defaultProps = {
+  jobs: {}
+};
 
 export default SectionJobs;

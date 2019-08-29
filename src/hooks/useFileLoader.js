@@ -13,6 +13,7 @@ const useFileLoader = baseURL => {
       });
       const blob = window.URL.createObjectURL(new Blob([response.data]));
       setFile(blob);
+      console.log('blob', blob);
     } catch (e) {
       console.error(`Could not get file from ${baseURL}${url}`);
     }
