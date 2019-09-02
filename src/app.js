@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { withStyles } from '@material-ui/core/styles';
 import Box from '@material-ui/core/Box';
 import Button from '@material-ui/core/Button';
 
+import { login, logout, logoutAll, createUser, deleteUser, updatePassword } from './actions/auth';
 import useAuthHandler from './hooks/useAuthHandler';
 import useFileLoader from './hooks/useFileLoader';
 
@@ -13,6 +14,9 @@ import SectionProfile from './components/SectionProfile';
 import SectionJobs from './components/SectionJobs';
 import SectionStudies from './components/SectionStudies';
 import SectionCourses from './components/SectionCourses';
+import ScreenLogin from './components/ScreenLogin';
+
+import AuthContext from './contexts/auth';
 
 const DOMAIN = `http://localhost:3000`;
 
@@ -26,34 +30,25 @@ const styles = theme =>
   };
 
 const App = () => {
-  const [currentCv, setCurrentCv] = useState(undefined);
-  const [profile, setProfile] = useState(undefined);
   const [jobs, setJobs] = useState(undefined);
   const [studies, setStudies] = useState(undefined);
   const [courses, setCourses] = useState(undefined);
+  const [photo, getPhoto, deletePhoto] = useFileLoader(DOMAIN);
 
-  const { userProfile, auth, cvs } = useAuthHandler(`${DOMAIN}/users/login`, {
-    email: 'ron@web.dev',
-    password: '12345abc'
-  });
+  const [auth, dispatch] = useAuthHandler();
+
+  // email: 'ron@web.dev',
+  // password: '12345abc'
 
   const handleGetCvs = async () => {
     try {
       const response = await axios({
-        url: `${DOMAIN}/cvs/${userProfile.cvs[0]._id}`,
+        url: `${DOMAIN}/cvs/${cvs[0]._id}`,
         method: 'get'
       });
 
       setCurrentCv(response.data);
-
-      const profileData = {
-        ...response.data.profile,
-        ...userProfile
-      };
-
-      console.log('studies', response.data.studies);
-
-      setProfile(profileData);
+      setProfile({ ...response.data.profile, ...userProfile });
       setJobs(response.data.jobs);
       setStudies(response.data.studies);
       setCourses(response.data.courses);
@@ -62,44 +57,78 @@ const App = () => {
     }
   };
 
-  const photo = useFileLoader(DOMAIN);
+  // useEffect(() => {
+  //   auth.login();
+  // }, []);
+
+  // useEffect(() => {
+  //   if (userProfile) handleGetCvs();
+  // }, [cvs]);
+
+  // useEffect(() => {
+  //   if (auth._id) getPhoto(`/users/${auth._id}/photo`);
+  // }, [auth._id]);
+
+  // if (!auth._id) {
+  //   return (
+  //     <AuthContext.Provider value={[auth, dispatch]}>
+  //       <ScreenLogin />
+  //     </AuthContext.Provider>
+  //   );
+  // }
 
   return (
     <main>
       <Box>
-        <Button variant="contained" onClick={auth.login}>
+        <Button
+          variant="contained"
+          onClick={() => dispatch(login({ email: 'ron@web.dev', password: '12345abc' }))}
+        >
           Log in
         </Button>
 
-        <Button variant="contained" onClick={auth.logout}>
+        <Button
+          variant="contained"
+          onClick={() => {
+            dispatch(logout());
+          }}
+        >
           Log out
         </Button>
 
-        <Button variant="contained" onClick={auth.createAccount}>
+        <Button variant="contained" onClick={() => console.log(auth)}>
+          Show auth
+        </Button>
+
+        <Button
+          variant="contained"
+          onClick={() => {
+            dispatch(createUser({ email: 'support@microsoft.com', password: 'b1llg4t3zZz' }));
+          }}
+        >
           Create new account
         </Button>
 
-        <Button variant="contained" onClick={auth.deleteAccount}>
+        <Button
+          variant="contained"
+          onClick={() => {
+            dispatch(deleteUser());
+          }}
+        >
           Delete account
         </Button>
 
         <Button
           variant="contained"
           onClick={() => {
-            auth.updateAccount({
-              firstName: 'Luke',
-              lastName: 'Skywalker'
-            });
+            dispatch(updatePassword({ firstName: 'Steve', lastName: 'Ballmer' }));
           }}
         >
-          Update account
-        </Button>
-
-        <Button variant="contained" onClick={auth.getToken}>
-          Get token
+          Update password
         </Button>
       </Box>
 
+      {/*
       <Box>
         <Button variant="contained" color="secondary" onClick={handleGetCvs}>
           Get CVs
@@ -110,7 +139,7 @@ const App = () => {
         <Button
           variant="contained"
           onClick={() => {
-            photo.get(`/users/${auth._id}/photo`);
+            getPhoto(`/users/${auth._id}/photo`);
           }}
         >
           Get photo
@@ -120,17 +149,17 @@ const App = () => {
           variant="contained"
           onClick={async () => {
             const token = await auth.getToken();
-            console.log(token);
-            photo.delete(`/users/photo`, token);
+            deletePhoto(`/users/photo`, token);
           }}
         >
           Delete photo
         </Button>
       </Box>
+        */}
 
       {jobs ? (
         <CV>
-          <SectionProfile profile={profile} photo={photo.file} />
+          <SectionProfile profile={profile} photo={photo} />
           <SectionJobs jobs={jobs} />
           <SectionStudies studies={studies} />
           <SectionCourses courses={courses} />

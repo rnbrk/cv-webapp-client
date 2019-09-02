@@ -1,3 +1,5 @@
+import React from 'react';
+import { mount } from 'enzyme';
 import checkPropTypes from 'check-prop-types';
 
 /**
@@ -20,3 +22,12 @@ export const checkProps = (Component, conformingProps) => {
  * @returns {ShallowWrapper}
  */
 export const findByTestAttr = (wrapper, val) => wrapper.find(`[data-test='${val}']`);
+
+const TestHook = ({ callback }) => {
+  callback();
+  return null;
+};
+
+export const testHook = callback => {
+  mount(<TestHook callback={callback} />);
+};

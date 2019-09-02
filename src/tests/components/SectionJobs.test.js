@@ -4,7 +4,7 @@ import checkPropTypes from 'check-prop-types';
 
 import SectionJobs from '../../components/SectionJobs';
 import TitleSection from '../../components/TitleSection';
-import ListItemJobs from '../../components/ListItemJobs';
+import ItemJob from '../../components/ItemJob';
 
 const jobs = {
   title: 'Job experience',
@@ -18,7 +18,8 @@ const jobs = {
       name: 'Tester',
       startDate: '2010-01-01T00:00:00.000Z',
       endDate: '2012-05-31T00:00:00.000Z',
-      responsibilities: ['Testing stuff', 'Throwing errors', 'Not throwing errors if not wanted']
+      responsibilities: ['Testing stuff', 'Throwing errors', 'Not throwing errors if not wanted'],
+      _id: '1'
     },
 
     {
@@ -32,7 +33,8 @@ const jobs = {
         'Crashing against stuff',
         'Being put back together',
         'Continously checking my health insurance'
-      ]
+      ],
+      _id: '2'
     }
   ],
   _id: '1234567890abc'
@@ -77,8 +79,14 @@ describe('Rendering children', () => {
     expect(component.length).toBe(1);
   });
 
-  it('should render ListItemJobs', () => {
-    const component = wrapper.find(ListItemJobs);
-    expect(component.length).toBe(1);
+  it('should render ItemJob', () => {
+    const component = wrapper.find(ItemJob);
+    expect(component.length).toBe(jobs.list.length);
+  });
+
+  it('should not render ItemJob if no job objects are added', () => {
+    wrapper = setup();
+    const component = wrapper.find(ItemJob);
+    expect(component.length).toBe(0);
   });
 });

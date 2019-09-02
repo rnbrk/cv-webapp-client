@@ -1,0 +1,21 @@
+import { act } from 'react-dom/test-utils';
+import axios, { instance } from 'axios';
+
+import { testHook } from '../testUtils';
+import useAuthHandler from '../../hooks/useAuthHandler';
+
+// Mock domain
+const DOMAIN = `http://localhost:3000`;
+
+// Mocking Axios
+jest.mock('axios');
+
+// Runs an instance of fileLoader
+let useAuthHandler;
+beforeEach(() => {
+  testHook(() => {
+    act(() => {
+      authHandler = useAuthHandler(DOMAIN);
+    });
+  });
+});

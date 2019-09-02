@@ -1,6 +1,5 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import uuid from 'uuid';
 import Book from '@material-ui/icons/Book';
 
 import StyledPaper from './StyledPaper';
@@ -14,7 +13,9 @@ const SectionCourses = ({ courses }) => (
     <StyledPaper>
       <TitleSection title={'Cursussen'} Icon={Book} />
       {courses &&
-        courses.list.sort(sortByName).map(course => <ItemCourse course={course} key={uuid()} />)}
+        courses.list
+          .sort(sortByName)
+          .map(course => <ItemCourse course={course} key={course._id} />)}
     </StyledPaper>
   </section>
 );

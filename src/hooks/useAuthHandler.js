@@ -1,171 +1,111 @@
-import { useState, useEffect } from 'react';
+import { useState, useReducer, useEffect } from 'react';
 import axios from 'axios';
 import moment from 'moment';
 
-const DOMAIN = `http://localhost:3000`;
+import requestReducer from '../reducers/auth';
 
-function useAuthHandler(url = `${DOMAIN}/users/login`, credentials) {
-  const [userProfile, setUserProfile] = useState(null);
-  const [auth, setAuth] = useState(null);
-  const [cvs, setCvs] = useState(null);
+const DOMAIN = 'http://localhost:3000';
 
-  async function login() {
+const initialRequest = {
+  url: undefined,
+  method: undefined,
+  data: {},
+  headers: {},
+  timeout: 5000
+};
+
+const initialAuth = {
+  _id: null,
+  token: null,
+  status: null
+};
+
+function useAuthHandler() {
+  const [auth, setAuth] = useState(initialAuth);
+  const [refreshToken, setRefreshToken] = useState(null);
+  const [action, dispatch] = useReducer(requestReducer, initialRequest);
+
+  // Starts request if action is made
+  useEffect(() => {
+    if (action.url !== undefined) {
+      _makeRequest(action);
+    }
+  }, [action]);
+
+  // Logs every status change in console
+  useEffect(() => {
+    console.log('auth.status', auth.status);
+  }, [auth]);
+
+  async function _makeRequest(action) {
+    if (action === null) return;
+
+    const req = { ...action };
+    if (req.requiresToken) {
+      req.headers = await _setHeaderIfAuthorized();
+      delete req.requiresToken;
+    }
+    
+    setAuth({ ...initialAuth, status: 'FETCHING' });
+
     try {
-      const response = await axios({
-        url: `${DOMAIN}/users/login`,
-        method: 'post',
-        data: {
-          ...credentials
-        }
-      });
+      console.log('req', req);
+      const res = await axios(req);
+      console.log('res', res.data);
 
-      console.log(response.status, response.data);
+      // LOG OUT
+      const loggingOut = !res.data.user || !res.data.user._id;
+      if (loggingOut) setAuth(initialAuth);
 
-      setUserProfile({ ...response.data.user });
-      setAuth({
-        refreshToken: response.data.refreshToken,
-        token: response.data.token,
-        _id: response.data.user._id,
-        email: response.data.user.email
-      });
-      setCvs({ ...response.data.user.cvs });
+      // LOG IN OR UPDATING DATA
+      if (!loggingOut) {
+        if (res.data.refreshToken) setRefreshToken(res.data.refreshToken);
 
-      // saveRefreshToken
+        const authData = _getAuthDataFromResponse(res);
+        setAuth({ ...authData, status: 'SUCCESS' });
+      }
     } catch (e) {
-      console.error(e);
+      setAuth({ ...initialAuth, status: 'FAILURE' });
     }
   }
 
-  async function logout() {
+  function _getAuthDataFromResponse(res) {
+    return {
+      email: res.data.user.email,
+      _id: res.data.user._id,
+      token: res.data.token ? res.data.token : auth.token
+    };
+  }
+
+  async function _setHeaderIfAuthorized() {
     try {
-      const payload = {
-        url: `${DOMAIN}/users/logout`,
-        method: 'post',
-        headers: { Authorization: `Bearer ${auth.token}` }
-      };
-
-      console.log(payload);
-
-      const response = await axios(payload);
-      setAuth(null);
-
-      console.log(response.status, response.data);
-
-      return true;
+      const token = await _getToken();
+      if (!token) throw new Error();
+      return { Authorization: `Bearer ${token}` };
     } catch (e) {
-      throw new Error(e);
+      setAuth({ ...initialAuth, status: 'FAILURE' });
     }
   }
 
-  async function logoutAll() {
-    try {
-      const response = await axios({
-        url: `${DOMAIN}/users/logoutAll`,
-        method: 'post',
-        headers: { Authorization: `Bearer ${auth.token}` }
-      });
-      setAuth(null);
-
-      console.log(response.status, response.data);
-
-      return true;
-    } catch (e) {
-      throw new Error(e);
-    }
-  }
-
-  async function createAccount() {
-    try {
-      const response = await axios({
-        url: `${DOMAIN}/users`,
-        method: 'post',
-        data: {
-          ...credentials
-        }
-      });
-      setUserProfile({ ...response.data.user });
-      setAuth({
-        refreshToken: response.data.refreshToken,
-        token: response.data.token,
-        _id: response.data.user._id,
-        email: response.data.user.email
-      });
-      setCvs({ ...response.data.user.cvs });
-
-      console.log(response.status, response.data);
-
-      // saveRefreshToken
-    } catch (e) {
-      console.error(e);
-    }
-  }
-
-  async function deleteAccount() {
-    try {
-      const response = await axios({
-        url: `${DOMAIN}/users`,
-        method: 'delete',
-        headers: { Authorization: `Bearer ${auth.token}` }
-      });
-      setUserProfile(null);
-      setAuth(null);
-      setCvs(null);
-
-      console.log(response.status, response.data);
-
-      // deleteRefreshToken
-    } catch (e) {
-      console.error(e);
-    }
-  }
-
-  async function updateAccount(data) {
-    try {
-      const response = await axios({
-        url: `${DOMAIN}/users`,
-        method: 'patch',
-        headers: { Authorization: `Bearer ${auth.token}` },
-        data
-      });
-
-      console.log(response.status, response.data);
-
-      setUserProfile({
-        ...userProfile,
-        ...response.data.user
-      });
-      setAuth({ ...auth, email: response.data.email });
-    } catch (e) {
-      console.error(e);
-    }
-  }
-
-  async function getToken() {
-    let token = auth.token;
-
+  async function _getToken() {
     if (_isValid(auth.token)) {
-      // console.log(`Token is valid. Here's ya token: ${auth.token}`);
-      token = auth.token;
+      return auth.token;
     }
 
-    if (!_isValid(auth.token) && _isValid(auth.refreshToken)) {
-      // console.log(
-      // `Token ${auth.token} is not valid, but refreshToken ${auth.refreshToken} is. Refreshing access token...`
-      // );
-      token = await _refreshAccessToken();
-      // console.log(`Here's ya token: ${token}`);
+    if (!_isValid(auth.token) && _isValid(refreshToken)) {
+      try {
+        const res = await _refreshAccessToken();
+        setAuth({ ...auth, token: res.token });
+        setRefreshToken(res.refreshToken);
+        return res.token;
+      } catch (e) {
+        return null;
+      }
     }
 
-    if (!_isValid(auth.refreshToken)) {
-      token = null;
-    }
-
-    setAuth({
-      ...auth,
-      token
-    });
-
-    return token;
+    // !_isValid(refreshToken)
+    setAuth(initialAuth);
+    return null;
   }
 
   /**
@@ -175,57 +115,35 @@ function useAuthHandler(url = `${DOMAIN}/users/login`, credentials) {
    * @returns {boolean} - Whether token is still valid
    */
   function _isValid(token, prop = 'exp') {
-    if (!token || typeof token !== 'string') {
-      return false;
-    }
+    if (!token || typeof token !== 'string') return false;
 
     const [header, payload] = token.split('.');
-    if (!payload) {
-      return false;
-    }
+    if (!payload) return false;
 
     const decoded = window.atob(payload);
     const parsed = JSON.parse(decoded);
     const expirationTime = moment.unix(parsed[prop]).utc();
-    if (!expirationTime.isValid()) {
-      return false;
-    }
 
+    if (!expirationTime.isValid()) return false;
     return expirationTime.isAfter(moment().utc());
   }
 
   async function _refreshAccessToken() {
     try {
-      const response = await axios({
+      const req = {
         url: `${DOMAIN}/users/token`,
-        method: 'post',
-        headers: { Authorization: `Bearer ${auth.refreshToken}` },
-        data: { email: credentials.email }
-      });
-
-      console.log(response.status, response.data);
-
-      return response.data.token;
+        method: 'POST',
+        headers: { Authorization: `Bearer ${refreshToken}` },
+        data: { email: auth.email }
+      };
+      const res = await axios(req);
+      return res.data;
     } catch (e) {
-      console.error(e);
-      return new Error(e);
+      throw new Error(e);
     }
   }
 
-  return {
-    userProfile,
-    auth: {
-      ...auth,
-      login,
-      logout,
-      logoutAll,
-      createAccount,
-      deleteAccount,
-      updateAccount,
-      getToken
-    },
-    cvs
-  };
+  return [auth, dispatch];
 }
 
 export default useAuthHandler;
