@@ -85,15 +85,16 @@ const useFileLoader = baseURL => {
     try {
       const response = await instance({
         url,
-        method: 'get',
+        method: 'GET',
         responseType: 'blob'
       });
+
+      console.log(response);
       const blobURL = window.URL.createObjectURL(new Blob([response.data]));
       setFile(blobURL);
       return blobURL;
     } catch (e) {
       console.error(`Could not get file from ${baseURL}${url}`);
-      return blobURL;
     }
   };
 

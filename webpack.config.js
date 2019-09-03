@@ -18,9 +18,10 @@ module.exports = {
     contentBase: path.join(__dirname, 'public'),
     port: 8080,
     open: false,
-    writeToDisk: true
+    writeToDisk: true,
+    historyApiFallback: true
   },
-  devtool: 'cheap-module-eval-source-map',
+  devtool: 'inline-source-map',
   module: {
     rules: [
       {

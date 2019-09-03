@@ -1,6 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import App from './app';
+import AppRouter from './routers/AppRouter';
 import 'typeface-roboto';
 
 import { createMuiTheme, MuiThemeProvider } from '@material-ui/core/styles';
@@ -43,7 +43,7 @@ const appElem = document.querySelector('.root');
 
 ReactDOM.render(
   <MuiThemeProvider theme={theme}>
-    <App />
+    <AppRouter />
   </MuiThemeProvider>,
   appElem
 );

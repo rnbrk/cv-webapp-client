@@ -11,6 +11,8 @@ import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
 import Typography from '@material-ui/core/Typography';
 import Container from '@material-ui/core/Container';
 
+import { Redirect } from 'react-router-dom';
+
 import AuthContext from '../contexts/auth';
 import useInputField from '../hooks/useInputField';
 import { login } from '../actions/auth';
@@ -30,6 +32,10 @@ const ScreenLogin = () => {
       })
     );
   };
+
+  if (auth._id) {
+    return <Redirect to="/cvs/5d49e7123492066d3e8aa1d2/edit" />;
+  }
 
   return (
     <Container component="main" maxWidth="xs">

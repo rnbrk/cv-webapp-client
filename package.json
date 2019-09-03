@@ -43,6 +43,7 @@
     "react": "^16.9.0",
     "react-dates": "^20.3.0",
     "react-dom": "^16.9.0",
+    "react-router-dom": "^5.0.1",
     "typeface-roboto": "0.0.75",
     "uuid": "^3.3.3",
     "webpack": "^4.39.2"

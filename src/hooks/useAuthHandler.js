@@ -3,6 +3,7 @@ import axios from 'axios';
 import moment from 'moment';
 
 import requestReducer from '../reducers/auth';
+import useStorageHandler, { storeItem, setNewKey } from '../hooks/useStorageHandler';
 
 const DOMAIN = 'http://localhost:3000';
 
@@ -15,15 +16,15 @@ const initialRequest = {
 };
 
 const initialAuth = {
-  _id: null,
+  _id: '',
   token: null,
   status: null
 };
 
 function useAuthHandler() {
   const [auth, setAuth] = useState(initialAuth);
-  const [refreshToken, setRefreshToken] = useState(null);
   const [action, dispatch] = useReducer(requestReducer, initialRequest);
+  const [refreshToken, dispatchToStorage] = useStorageHandler();
 
   // Starts request if action is made
   useEffect(() => {
@@ -34,7 +35,9 @@ function useAuthHandler() {
 
   // Logs every status change in console
   useEffect(() => {
-    console.log('auth.status', auth.status);
+    if (auth._id) {
+      dispatchToStorage(setNewKey(auth._id || null));
+    }
   }, [auth]);
 
   async function _makeRequest(action) {
@@ -45,13 +48,11 @@ function useAuthHandler() {
       req.headers = await _setHeaderIfAuthorized();
       delete req.requiresToken;
     }
-    
+
     setAuth({ ...initialAuth, status: 'FETCHING' });
 
     try {
-      console.log('req', req);
       const res = await axios(req);
-      console.log('res', res.data);
 
       // LOG OUT
       const loggingOut = !res.data.user || !res.data.user._id;
@@ -59,7 +60,7 @@ function useAuthHandler() {
 
       // LOG IN OR UPDATING DATA
       if (!loggingOut) {
-        if (res.data.refreshToken) setRefreshToken(res.data.refreshToken);
+        if (res.data.refreshToken) dispatchToStorage(storeItem(res.data.refreshToken));
 
         const authData = _getAuthDataFromResponse(res);
         setAuth({ ...authData, status: 'SUCCESS' });
@@ -96,7 +97,7 @@ function useAuthHandler() {
       try {
         const res = await _refreshAccessToken();
         setAuth({ ...auth, token: res.token });
-        setRefreshToken(res.refreshToken);
+        dispatchToStorage(storeItem(res.refreshToken));
         return res.token;
       } catch (e) {
         return null;
