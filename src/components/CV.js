@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
 import Box from '@material-ui/core/Box';
 import Container from '@material-ui/core/Container';
 import { withStyles } from '@material-ui/core/styles';
@@ -10,7 +9,8 @@ import SectionStudies from '../components/SectionStudies';
 import SectionCourses from '../components/SectionCourses';
 import Loading from '../components/Loading';
 
-import useFileLoader from '../hooks/useFileLoader';
+import useRequest from '../hooks/useRequest';
+import { generateBlobURL } from '../utils/utils';
 
 const DOMAIN = `http://localhost:3000`;
 
@@ -28,48 +28,41 @@ const userData = {
   email: 'ron@web.dev'
 };
 
-const CV = ({ classes, cvId, userId }) => {
-  const [cv, setCv] = useState(undefined);
-  const [photo, getPhoto] = useFileLoader(DOMAIN);
-
-  // email: 'ron@web.dev',
-  // password: '12345abc'
-
-  const handleGetCvs = async () => {
-    try {
-      const res = await axios({
-        url: `${DOMAIN}/cvs/${cvId}`,
-        method: 'GET'
-      });
-
-      setCv(res.data);
-    } catch (e) {
-      console.error('Error', e);
-    }
-  };
+const CV = ({ classes, cvId }) => {
+  const [response, makeRequest] = useRequest(DOMAIN);
+  const [fileResponse, makeFileRequest] = useRequest(DOMAIN);
+  const [photo, setPhoto] = useState(null);
 
   useEffect(() => {
-    handleGetCvs();
+    makeRequest(`/cvs/${cvId}`);
   }, []);
 
   useEffect(() => {
-    if (cv) {
-      getPhoto(`users/${cv.user}/photo`);
+    if (response.status === 'SUCCESS') {
+      makeFileRequest(`users/${response.data.user}/photo`, 'GET', { responseType: 'blob' });
     }
-  }, [cv]);
+  }, [response.status]);
+
+  useEffect(() => {
+    if (fileResponse.status === 'SUCCESS') {
+      setPhoto(generateBlobURL(fileResponse.data));
+    }
+  }, [fileResponse.status]);
 
   return (
     <Container maxWidth="md">
-      {cv ? (
+      {response.status === 'SUCCESS' && (
         <Box bgcolor="#EEEEEE" className={classes.root}>
-          <SectionProfile profile={{ ...(cv.profile || {}), ...userData }} photo={photo || ''} />
-          <SectionJobs jobs={cv.jobs} />
-          <SectionStudies studies={cv.studies} />
-          <SectionCourses courses={cv.courses} />
+          <SectionProfile profile={{ ...response.data.profile, ...userData }} photo={photo} />
+          <SectionJobs jobs={response.data.jobs} />
+          <SectionStudies studies={response.data.studies} />
+          <SectionCourses courses={response.data.courses} />
         </Box>
-      ) : (
-        <Loading />
       )}
+
+      {response.status === 'FETCHING' && <Loading />}
+
+      {response.status === 'LOADING' && <div>Error!</div>}
     </Container>
   );
 };
