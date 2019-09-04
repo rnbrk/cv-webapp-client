@@ -6,14 +6,15 @@ import TopBar from '../components/TopBar';
 import NotFound from '../components/NotFound';
 import ScreenLogin from '../components/ScreenLogin';
 
-import useStorageHandler from '../hooks/useStorageHandler';
+import PrivateRoute from '../routers/PrivateRoute';
+
 import useAuthHandler from '../hooks/useAuthHandler';
 import AuthContext from '../contexts/auth';
-import PrivateRoute from '../routers/PrivateRoute';
+import EditModeContext from '../contexts/editMode';
+import CurrentCvContext from '../contexts/currentCv';
 
 const AppRouter = () => {
   const [auth, dispatch] = useAuthHandler();
-  const [storage, dispatchStorage] = useStorageHandler();
 
   return (
     <div>
@@ -32,28 +33,45 @@ const AppRouter = () => {
           <Route
             path="/cvs/:id"
             exact
-            render={({ match }) => (
-              <div>
-                <AuthContext.Provider value={[auth, dispatch]}>
-                  <TopBar storage={[storage, dispatchStorage]} />
-                </AuthContext.Provider>
-                <CV cvId={match.params.id} />
-              </div>
-            )}
+            component={({ match }) => {
+              console.log('match View mode', match.params.id);
+
+              return (
+                <div>
+                  <h2>VIEW MODE</h2>
+                  <CurrentCvContext.Provider value={match.params.id}>
+                    <AuthContext.Provider value={[auth, dispatch]}>
+                      <EditModeContext.Provider value={false}>
+                        <TopBar />
+                      </EditModeContext.Provider>
+                    </AuthContext.Provider>
+                  </CurrentCvContext.Provider>
+                  <CV currentCv={match.params.id} />
+                </div>
+              );
+            }}
           />
           <AuthContext.Provider value={[auth, dispatch]}>
             <PrivateRoute
               path="/cvs/:id/edit"
               exact
-              Component={({ match }) => (
-                <div>
-                  <h2>EDIT MODE</h2>
-                  <AuthContext.Provider value={[auth, dispatch]}>
-                    <TopBar />
-                  </AuthContext.Provider>
-                  <CV cvId={match.params.id} />
-                </div>
-              )}
+              Component={({ match }) => {
+                console.log('match Edit mode', match.params.id);
+
+                return (
+                  <div>
+                    <h2>EDIT MODE</h2>
+                    <CurrentCvContext.Provider value={match.params.id}>
+                      <AuthContext.Provider value={[auth, dispatch]}>
+                        <EditModeContext.Provider value={true}>
+                          <TopBar />
+                        </EditModeContext.Provider>
+                      </AuthContext.Provider>
+                    </CurrentCvContext.Provider>
+                    <CV currentCv={match.params.id} />
+                  </div>
+                );
+              }}
             />
           </AuthContext.Provider>
 

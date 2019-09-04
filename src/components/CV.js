@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import Box from '@material-ui/core/Box';
 import Container from '@material-ui/core/Container';
 import { withStyles } from '@material-ui/core/styles';
@@ -9,6 +9,7 @@ import SectionStudies from '../components/SectionStudies';
 import SectionCourses from '../components/SectionCourses';
 import Loading from '../components/Loading';
 
+import { withRouter } from 'react-router';
 import useRequest from '../hooks/useRequest';
 import { generateBlobURL } from '../utils/utils';
 
@@ -28,18 +29,26 @@ const userData = {
   email: 'ron@web.dev'
 };
 
-const CV = ({ classes, cvId }) => {
+const CV = ({ classes, match }) => {
   const [response, makeRequest] = useRequest(DOMAIN);
   const [fileResponse, makeFileRequest] = useRequest(DOMAIN);
   const [photo, setPhoto] = useState(null);
 
+  const handleRequest = useCallback(() => makeRequest(`/cvs/${match.params.id}`), [
+    match.params.id
+  ]);
+
+  const handleFileRequest = useCallback(() => {
+    makeFileRequest(`users/${response.data.user}/photo`, 'GET', { responseType: 'blob' });
+  }, [response.status]);
+
   useEffect(() => {
-    makeRequest(`/cvs/${cvId}`);
+    handleRequest();
   }, []);
 
   useEffect(() => {
     if (response.status === 'SUCCESS') {
-      makeFileRequest(`users/${response.data.user}/photo`, 'GET', { responseType: 'blob' });
+      handleFileRequest();
     }
   }, [response.status]);
 
@@ -67,4 +76,4 @@ const CV = ({ classes, cvId }) => {
   );
 };
 
-export default withStyles(styles)(CV);
+export default withStyles(styles)(withRouter(CV));
