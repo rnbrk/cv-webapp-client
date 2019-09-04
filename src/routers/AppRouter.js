@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { BrowserRouter, Redirect, Route, Switch } from 'react-router-dom';
 
 import CV from '../components/CV';
@@ -6,7 +6,7 @@ import TopBar from '../components/TopBar';
 import NotFound from '../components/NotFound';
 import ScreenLogin from '../components/ScreenLogin';
 
-import useStorageHandler, { storeItem } from '../hooks/useStorageHandler';
+import useStorageHandler from '../hooks/useStorageHandler';
 import useAuthHandler from '../hooks/useAuthHandler';
 import AuthContext from '../contexts/auth';
 import PrivateRoute from '../routers/PrivateRoute';

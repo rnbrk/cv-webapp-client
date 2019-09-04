@@ -4,11 +4,10 @@ import Button from '@material-ui/core/Button';
 
 import AuthContext from '../contexts/auth';
 import { login, logout, logoutAll, createUser, deleteUser, updatePassword } from '../actions/auth';
-import { storeItem, removeItem, clearStorage, setNewKey } from '../hooks/useStorageHandler';
+import { storeItem, removeItem, setNewKey } from '../actions/storage';
 
 const TopBar = ({ storage }) => {
   const [auth, dispatch] = useContext(AuthContext);
-  const [storedItem, dispatchToStorage] = storage;
 
   return (
     <div>
@@ -58,48 +57,6 @@ const TopBar = ({ storage }) => {
           }}
         >
           Update password
-        </Button>
-      </Box>
-
-      <Box>
-        <Button
-          variant="contained"
-          color="secondary"
-          onClick={() => {
-            console.log(storedItem);
-          }}
-        >
-          Get item
-        </Button>
-
-        <Button
-          variant="contained"
-          color="secondary"
-          onClick={() => {
-            dispatchToStorage(storeItem({ name: 'myName', age: '99999' }));
-          }}
-        >
-          Store item
-        </Button>
-
-        <Button
-          variant="contained"
-          color="secondary"
-          onClick={() => {
-            dispatchToStorage(removeItem());
-          }}
-        >
-          Remove item
-        </Button>
-
-        <Button
-          variant="contained"
-          color="secondary"
-          onClick={() => {
-            dispatchToStorage(setNewKey('xyz23y65v398'));
-          }}
-        >
-          Set key
         </Button>
       </Box>
     </div>

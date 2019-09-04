@@ -62,7 +62,7 @@ const CV = ({ classes, cvId, userId }) => {
     <Container maxWidth="md">
       {cv ? (
         <Box bgcolor="#EEEEEE" className={classes.root}>
-          <SectionProfile profile={{ ...cv.profile, ...userData }} photo={photo} />
+          <SectionProfile profile={{ ...(cv.profile || {}), ...userData }} photo={photo || ''} />
           <SectionJobs jobs={cv.jobs} />
           <SectionStudies studies={cv.studies} />
           <SectionCourses courses={cv.courses} />

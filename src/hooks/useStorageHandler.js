@@ -1,14 +1,6 @@
 import { useState } from 'react';
 
 /**
- * Action creators
- */
-export const storeItem = item => ({ type: 'STORE_ITEM', payload: item });
-export const removeItem = () => ({ type: 'REMOVE_ITEM' });
-// export const clearStorage = () => ({ type: 'CLEAR_STORAGE' });
-export const setNewKey = key => ({ type: 'SET_KEY', payload: key });
-
-/**
  * Stores and retrieves items from localStorage, can be passed around in a React app
  * @param {string} initialKey
  */
@@ -32,14 +24,6 @@ const useStorageHandler = () => {
       console.log('REMOVE_ITEM', key);
     }
   }
-
-  // function _clear() {
-  //   if (typeof key === 'string') {
-  //     window.localStorage.clear();
-  //     setItem(null);
-  //     console.log('CLEAR_STORAGE');
-  //   }
-  // }
 
   function _setKeyAndGetItem(key) {
     if (typeof key !== 'string' && key !== null) {

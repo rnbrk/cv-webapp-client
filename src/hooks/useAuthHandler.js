@@ -3,7 +3,8 @@ import axios from 'axios';
 import moment from 'moment';
 
 import requestReducer from '../reducers/auth';
-import useStorageHandler, { storeItem, setNewKey } from '../hooks/useStorageHandler';
+// import useStorageHandler from '../hooks/useStorageHandler';
+// import { storeItem, removeItem, setNewKey } from '../actions/storage';
 
 const DOMAIN = 'http://localhost:3000';
 
@@ -24,7 +25,7 @@ const initialAuth = {
 function useAuthHandler() {
   const [auth, setAuth] = useState(initialAuth);
   const [action, dispatch] = useReducer(requestReducer, initialRequest);
-  const [refreshToken, dispatchToStorage] = useStorageHandler();
+  const [refreshToken, setRefreshToken] = useState(null);
 
   // Starts request if action is made
   useEffect(() => {
@@ -32,13 +33,6 @@ function useAuthHandler() {
       _makeRequest(action);
     }
   }, [action]);
-
-  // Logs every status change in console
-  useEffect(() => {
-    if (auth._id) {
-      dispatchToStorage(setNewKey(auth._id || null));
-    }
-  }, [auth]);
 
   async function _makeRequest(action) {
     if (action === null) return;
@@ -60,7 +54,7 @@ function useAuthHandler() {
 
       // LOG IN OR UPDATING DATA
       if (!loggingOut) {
-        if (res.data.refreshToken) dispatchToStorage(storeItem(res.data.refreshToken));
+        if (res.data.refreshToken) setRefreshToken(res.data.refreshToken);
 
         const authData = _getAuthDataFromResponse(res);
         setAuth({ ...authData, status: 'SUCCESS' });
@@ -97,7 +91,7 @@ function useAuthHandler() {
       try {
         const res = await _refreshAccessToken();
         setAuth({ ...auth, token: res.token });
-        dispatchToStorage(storeItem(res.refreshToken));
+        setRefreshToken(res.refreshToken);
         return res.token;
       } catch (e) {
         return null;

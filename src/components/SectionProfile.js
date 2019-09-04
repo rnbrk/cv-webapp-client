@@ -19,13 +19,12 @@ const SectionProfile = ({ profile, photo }) => (
 );
 
 SectionProfile.propTypes = {
-  profile: PropTypes.object.isRequired,
-  photo: PropTypes.object.isRequired
+  profile: PropTypes.object,
+  photo: PropTypes.string
 };
 
 SectionProfile.defaultProps = {
-  profile: {},
-  photo: {}
+  profile: {}
 };
 
 export default SectionProfile;
