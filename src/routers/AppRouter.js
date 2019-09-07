@@ -19,6 +19,15 @@ const AppRouter = () => {
   return (
     <div>
       <BrowserRouter>
+        {/*// TODO: Create a separate non exact route for TopBar to prevent rerender / remount */}
+
+        {/*<Route path="/cvs/:id" render={({ match }) => {
+          return (
+            <AuthContext.Provider value={[auth, dispatch]}>
+              <TopBar currentCv={match.params.id} editMode={editMode} />
+            </AuthContext.Provider>
+        }} /> */}
+
         <Switch>
           <Route path="/" exact render={() => <Redirect to="/cvs/5d49e7123492066d3e8aa1d2" />} />
           <Route
@@ -32,13 +41,62 @@ const AppRouter = () => {
           />
           <Route
             path="/cvs/:id"
+            render={({ match }) => (
+              <Route
+                path="/cvs/:id/edit"
+                // Using children isMatched will be null when the route is /cvs/:id without /edit
+                // This is used for conditional logic inside TopBar to change the appearance based on View or Edit mode
+                children={({ match: isMatched }) => {
+                  const isAuthenticated = !!auth._id;
+                  const editMode = !!isMatched;
+
+                  if (editMode && !isAuthenticated) return <Redirect to="/login" />;
+
+                  return (
+                    <AuthContext.Provider value={[auth, dispatch]}>
+                      <TopBar currentCv={match.params.id} editMode={editMode} />
+                      <CV currentCv={match.params.id} />
+                    </AuthContext.Provider>
+                  );
+                }}
+              />
+            )}
+          />
+
+          <Route component={NotFound} />
+        </Switch>
+      </BrowserRouter>
+    </div>
+  );
+};
+
+export default AppRouter;
+
+/**
+ * NEW INTEGRATED VERSION
+ */
+
+/*
+ 
+<Route path="" exact component={} />
+          <PrivateRoute path="/edit" exact isAuthenticated={!!auth._id} component={} />
+
+ */
+
+/**
+ * VIEW MODE
+ */
+
+/*
+
+<Route
+            path="/cvs/:id"
             exact
             component={({ match }) => {
               console.log('match View mode', match.params.id);
 
               return (
                 <div>
-                  <h2>VIEW MODE</h2>
                   <CurrentCvContext.Provider value={match.params.id}>
                     <AuthContext.Provider value={[auth, dispatch]}>
                       <EditModeContext.Provider value={false}>
@@ -51,7 +109,16 @@ const AppRouter = () => {
               );
             }}
           />
-          <AuthContext.Provider value={[auth, dispatch]}>
+
+
+ */
+
+/**
+ * EDIT MODE
+ */
+/*
+
+        <AuthContext.Provider value={[auth, dispatch]}>
             <PrivateRoute
               path="/cvs/:id/edit"
               exact
@@ -60,7 +127,6 @@ const AppRouter = () => {
 
                 return (
                   <div>
-                    <h2>EDIT MODE</h2>
                     <CurrentCvContext.Provider value={match.params.id}>
                       <AuthContext.Provider value={[auth, dispatch]}>
                         <EditModeContext.Provider value={true}>
@@ -75,11 +141,4 @@ const AppRouter = () => {
             />
           </AuthContext.Provider>
 
-          <Route component={NotFound} />
-        </Switch>
-      </BrowserRouter>
-    </div>
-  );
-};
-
-export default AppRouter;
+          */

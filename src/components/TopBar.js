@@ -1,92 +1,115 @@
 import React, { useContext } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, Switch } from 'react-router-dom';
 import Box from '@material-ui/core/Box';
 import Button from '@material-ui/core/Button';
+import { makeStyles } from '@material-ui/core/styles';
+import AppBar from '@material-ui/core/AppBar';
+import Toolbar from '@material-ui/core/Toolbar';
+import Typography from '@material-ui/core/Typography';
+
+import { Redirect } from 'react-router-dom';
+import PrivateRoute from '../routers/PrivateRoute';
+
+import MenuTabs from './MenuTabs';
 
 import AuthContext from '../contexts/auth';
-import CurrentCvContext from '../contexts/currentCv';
 import EditModeContext from '../contexts/editMode';
-import { login, logout, logoutAll, createUser, deleteUser, updatePassword } from '../actions/auth';
+import { login, logout, createUser } from '../actions/auth';
 
-const TopBar = () => {
+const useStyles = makeStyles(theme => ({
+  root: {
+    flexGrow: 1,
+    zIndex: 1000
+  },
+  menuButton: {
+    marginRight: theme.spacing(2)
+  },
+  title: {
+    flexGrow: 1
+  }
+}));
+
+const TopBar = ({ currentCv, editMode }) => {
   const [auth, dispatch] = useContext(AuthContext);
-  const editMode = useContext(EditModeContext);
-  const currentCv = useContext(CurrentCvContext);
   const isAuthenticated = () => !!auth._id;
 
-  return (
-    <div>
+  const classes = useStyles();
+
+  const ViewMode = props => (
+    <Box>
       {isAuthenticated() ? (
-        <Box bgcolor="yellow">
+        <Box>
           <Button
-            variant="contained"
+            color="inherit"
             onClick={() => {
               dispatch(logout());
             }}
           >
             Log out
           </Button>
-
-          <Button variant="contained" onClick={() => console.log(auth)}>
-            Show auth
-          </Button>
-
-          <Button
-            variant="contained"
-            onClick={() => {
-              dispatch(deleteUser());
-            }}
-          >
-            Delete account
-          </Button>
-
-          <Button
-            variant="contained"
-            onClick={() => {
-              dispatch(updatePassword({ firstName: 'Steve', lastName: 'Ballmer' }));
-            }}
-          >
-            Update password
-          </Button>
-
-          {editMode ? (
-            <Button component={Link} to={`/cvs/${currentCv}`} variant="contained" color="primary">
-              View
-            </Button>
-          ) : (
-            <Button
-              component={Link}
-              to={`/cvs/${currentCv}/edit`}
-              variant="contained"
-              color="primary"
-            >
-              Edit
-            </Button>
-          )}
         </Box>
       ) : (
-        <Box bgcolor="red">
+        <Box>
           <Button
-            variant="contained"
+            color="inherit"
             onClick={() => dispatch(login({ email: 'ron@web.dev', password: '12345abc' }))}
           >
             Log in
           </Button>
-
           <Button
-            variant="contained"
+            color="inherit"
             onClick={() => {
               dispatch(createUser({ email: 'support@microsoft.com', password: 'b1llg4t3zZz' }));
             }}
           >
             Sign up
           </Button>
-
-          <Button variant="contained" onClick={() => console.log(auth)}>
-            Show auth
-          </Button>
         </Box>
       )}
+
+      <Button component={Link} to={`/cvs/${currentCv}/edit`} color="secondary" variant="contained">
+        Edit
+      </Button>
+    </Box>
+  );
+
+  const EditMode = props => (
+    <Box>
+      <Box>
+        <Button
+          color="inherit"
+          onClick={() => {
+            dispatch(logout());
+          }}
+        >
+          Log out
+        </Button>
+      </Box>
+      <Button component={Link} to={`/cvs/${currentCv}`} variant="contained" color="primary">
+        View
+      </Button>
+    </Box>
+  );
+
+  const EditModeMenuTabs = () => (
+    <MenuTabs
+      items={auth.cvs || []}
+      initialValue={auth.cvs.findIndex(item => item._id === currentCv)}
+    />
+  );
+
+  return (
+    <div className={classes.root}>
+      <AppBar position="static">
+        <Toolbar>
+          <Typography variant="h6" className={classes.title}>
+            CV Web app
+          </Typography>
+          {editMode ? <EditMode /> : <ViewMode />}
+        </Toolbar>
+      </AppBar>
+
+      {editMode && isAuthenticated() && <EditModeMenuTabs />}
     </div>
   );
 };

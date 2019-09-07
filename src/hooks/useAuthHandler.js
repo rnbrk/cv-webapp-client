@@ -3,8 +3,6 @@ import axios from 'axios';
 import moment from 'moment';
 
 import requestReducer from '../reducers/auth';
-// import useStorageHandler from '../hooks/useStorageHandler';
-// import { storeItem, removeItem, setNewKey } from '../actions/storage';
 
 const DOMAIN = 'http://localhost:3000';
 
@@ -68,6 +66,7 @@ function useAuthHandler() {
     return {
       email: res.data.user.email,
       _id: res.data.user._id,
+      cvs: res.data.user.cvs,
       token: res.data.token ? res.data.token : auth.token
     };
   }

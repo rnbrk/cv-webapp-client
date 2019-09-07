@@ -29,14 +29,12 @@ const userData = {
   email: 'ron@web.dev'
 };
 
-const CV = ({ classes, match }) => {
+const CV = ({ classes, currentCv }) => {
   const [response, makeRequest] = useRequest(DOMAIN);
   const [fileResponse, makeFileRequest] = useRequest(DOMAIN);
   const [photo, setPhoto] = useState(null);
 
-  const handleRequest = useCallback(() => makeRequest(`/cvs/${match.params.id}`), [
-    match.params.id
-  ]);
+  const handleRequest = useCallback(() => makeRequest(`/cvs/${currentCv}`), [currentCv]);
 
   const handleFileRequest = useCallback(() => {
     makeFileRequest(`users/${response.data.user}/photo`, 'GET', { responseType: 'blob' });
@@ -44,7 +42,7 @@ const CV = ({ classes, match }) => {
 
   useEffect(() => {
     handleRequest();
-  }, []);
+  }, [currentCv]);
 
   useEffect(() => {
     if (response.status === 'SUCCESS') {

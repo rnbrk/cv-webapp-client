@@ -42,7 +42,6 @@ const useRequest = (baseURL = '') => {
   const makeRequest = async (url, method = 'GET', options = {}) => {
     dispatch(fetching());
     try {
-      console.log({ baseURL, url, method, ...options });
       const response = await axios({ baseURL, url, method, ...options });
       dispatch(success(response.data));
     } catch (e) {
