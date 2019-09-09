@@ -1,5 +1,5 @@
-import React, { useContext } from 'react';
-import { Link, Switch } from 'react-router-dom';
+import React, { useContext, useEffect, useState } from 'react';
+import { Link, Redirect } from 'react-router-dom';
 import Box from '@material-ui/core/Box';
 import Button from '@material-ui/core/Button';
 import { makeStyles } from '@material-ui/core/styles';
@@ -7,13 +7,9 @@ import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
 import Typography from '@material-ui/core/Typography';
 
-import { Redirect } from 'react-router-dom';
-import PrivateRoute from '../routers/PrivateRoute';
-
-import MenuTabs from './MenuTabs';
-
-import AuthContext from '../contexts/auth';
 import EditModeContext from '../contexts/editMode';
+import MenuTabs from './MenuTabs';
+import AuthContext from '../contexts/auth';
 import { login, logout, createUser } from '../actions/auth';
 
 const useStyles = makeStyles(theme => ({
@@ -29,15 +25,14 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-const TopBar = ({ currentCv, editMode }) => {
+const TopBar = ({ currentCv, location, match }) => {
   const [auth, dispatch] = useContext(AuthContext);
-  const isAuthenticated = () => !!auth._id;
-
+  const [editMode] = useContext(EditModeContext);
   const classes = useStyles();
 
   const ViewMode = props => (
     <Box>
-      {isAuthenticated() ? (
+      {auth._id ? (
         <Box>
           <Button
             color="inherit"
@@ -67,9 +62,16 @@ const TopBar = ({ currentCv, editMode }) => {
         </Box>
       )}
 
-      <Button component={Link} to={`/cvs/${currentCv}/edit`} color="secondary" variant="contained">
-        Edit
-      </Button>
+      {auth._id && (
+        <Button
+          component={Link}
+          to={`/cvs/${currentCv}?edit=true`}
+          color="secondary"
+          variant="contained"
+        >
+          Edit
+        </Button>
+      )}
     </Box>
   );
 
@@ -78,8 +80,14 @@ const TopBar = ({ currentCv, editMode }) => {
       <Box>
         <Button
           color="inherit"
+          component={Link}
+          to={`/cvs/${currentCv}`}
+          color="inherit"
           onClick={() => {
             dispatch(logout());
+            // setTimeout(() => {
+            //   dispatch(logout());
+            // }, 1000);
           }}
         >
           Log out
@@ -93,10 +101,16 @@ const TopBar = ({ currentCv, editMode }) => {
 
   const EditModeMenuTabs = () => (
     <MenuTabs
+      location={location}
+      match={match}
       items={auth.cvs || []}
-      initialValue={auth.cvs.findIndex(item => item._id === currentCv)}
+      initialValue={auth.cvs || auth.cvs.findIndex(item => auth.cvs._id === currentCv)}
     />
   );
+
+  if (editMode && !auth._id) {
+    return <Redirect to="/login" />;
+  }
 
   return (
     <div className={classes.root}>
@@ -109,7 +123,7 @@ const TopBar = ({ currentCv, editMode }) => {
         </Toolbar>
       </AppBar>
 
-      {editMode && isAuthenticated() && <EditModeMenuTabs />}
+      {editMode && auth._id && <EditModeMenuTabs />}
     </div>
   );
 };

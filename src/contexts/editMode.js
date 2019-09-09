@@ -1,5 +1,5 @@
 import { createContext } from 'react';
 
-const EditModeContext = createContext(false);
+const EditModeContext = createContext();
 
 export default EditModeContext;

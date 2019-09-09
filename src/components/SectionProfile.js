@@ -6,17 +6,25 @@ import StyledPaper from './StyledPaper';
 import ContactDetails from './ContactDetails';
 import Portrait from './Portrait';
 
-const SectionProfile = ({ profile, photo }) => (
-  <StyledPaper>
-    <ContactDetails
-      email={profile.email}
-      phoneNumber={profile.phoneNumber}
-      website={profile.website}
-    />
-    <Portrait name={profile.fullName} title={profile.profession} _id={profile._id} photo={photo} />
-    <AboutMe paragraph={profile && profile.paragraph} />
-  </StyledPaper>
-);
+const SectionProfile = ({ profile, photo }) => {
+  return (
+    <StyledPaper>
+      <ContactDetails
+        email={profile.email}
+        phoneNumber={profile.phoneNumber}
+        website={profile.website}
+      />
+      <Portrait
+        name={profile.fullName}
+        title={profile.profession}
+        _id={profile._id}
+        photo={photo}
+      />
+      <div></div>
+      <AboutMe paragraph={profile && profile.paragraph} />
+    </StyledPaper>
+  );
+};
 
 SectionProfile.propTypes = {
   profile: PropTypes.object,

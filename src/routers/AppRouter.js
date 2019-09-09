@@ -1,72 +1,56 @@
-import React from 'react';
-import { BrowserRouter, Redirect, Route, Switch } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
+import { Router, Redirect, Route, Switch } from 'react-router-dom';
+import history from './history';
 
 import CV from '../components/CV';
 import TopBar from '../components/TopBar';
 import NotFound from '../components/NotFound';
 import ScreenLogin from '../components/ScreenLogin';
-
-import PrivateRoute from '../routers/PrivateRoute';
-
 import useAuthHandler from '../hooks/useAuthHandler';
 import AuthContext from '../contexts/auth';
 import EditModeContext from '../contexts/editMode';
-import CurrentCvContext from '../contexts/currentCv';
+import { getBooleanFromUrlQuery } from '../utils/utils';
 
 const AppRouter = () => {
   const [auth, dispatch] = useAuthHandler();
 
+  const mainPage = ({ match, location }) => {
+    const [editMode, setEditMode] = useState(getBooleanFromUrlQuery(location.search, 'edit'));
+
+    useEffect(() => {
+      setEditMode(getBooleanFromUrlQuery(location.search, 'edit'));
+    }, [location.search]);
+
+    return (
+      <EditModeContext.Provider value={[editMode, setEditMode]}>
+        <AuthContext.Provider value={[auth, dispatch]}>
+          <TopBar
+            currentCv={match.params.id}
+            search={location.search}
+            location={location}
+            match={match}
+          />
+          <CV currentCv={match.params.id} />
+        </AuthContext.Provider>
+      </EditModeContext.Provider>
+    );
+  };
+
+  const loginPage = () => (
+    <AuthContext.Provider value={[auth, dispatch]}>
+      <ScreenLogin />
+    </AuthContext.Provider>
+  );
+
   return (
-    <div>
-      <BrowserRouter>
-        {/*// TODO: Create a separate non exact route for TopBar to prevent rerender / remount */}
-
-        {/*<Route path="/cvs/:id" render={({ match }) => {
-          return (
-            <AuthContext.Provider value={[auth, dispatch]}>
-              <TopBar currentCv={match.params.id} editMode={editMode} />
-            </AuthContext.Provider>
-        }} /> */}
-
-        <Switch>
-          <Route path="/" exact render={() => <Redirect to="/cvs/5d49e7123492066d3e8aa1d2" />} />
-          <Route
-            path="/login"
-            exact
-            render={() => (
-              <AuthContext.Provider value={[auth, dispatch]}>
-                <ScreenLogin />
-              </AuthContext.Provider>
-            )}
-          />
-          <Route
-            path="/cvs/:id"
-            render={({ match }) => (
-              <Route
-                path="/cvs/:id/edit"
-                // Using children isMatched will be null when the route is /cvs/:id without /edit
-                // This is used for conditional logic inside TopBar to change the appearance based on View or Edit mode
-                children={({ match: isMatched }) => {
-                  const isAuthenticated = !!auth._id;
-                  const editMode = !!isMatched;
-
-                  if (editMode && !isAuthenticated) return <Redirect to="/login" />;
-
-                  return (
-                    <AuthContext.Provider value={[auth, dispatch]}>
-                      <TopBar currentCv={match.params.id} editMode={editMode} />
-                      <CV currentCv={match.params.id} />
-                    </AuthContext.Provider>
-                  );
-                }}
-              />
-            )}
-          />
-
-          <Route component={NotFound} />
-        </Switch>
-      </BrowserRouter>
-    </div>
+    <Router history={history}>
+      <Switch>
+        <Route path="/" exact render={() => <Redirect to="/cvs/5d49e7123492066d3e8aa1d2" />} />
+        <Route path="/cvs/:id" component={mainPage} />
+        <Route path="/login" exact component={loginPage} />
+        <Route component={NotFound} />
+      </Switch>
+    </Router>
   );
 };
 

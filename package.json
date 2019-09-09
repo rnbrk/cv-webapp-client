@@ -43,9 +43,11 @@
     "prop-types": "^15.7.2",
     "query-string": "^6.8.3",
     "react": "^16.9.0",
+    "react-contenteditable": "^3.3.2",
     "react-dates": "^20.3.0",
     "react-dom": "^16.9.0",
     "react-router-dom": "^5.0.1",
+    "react-transition-group": "^4.3.0",
     "typeface-roboto": "0.0.75",
     "uuid": "^3.3.3",
     "webpack": "^4.39.2"
