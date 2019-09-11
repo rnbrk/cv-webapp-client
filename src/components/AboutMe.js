@@ -1,8 +1,8 @@
-import React, { createRef, useContext, useState } from 'react';
+import React, { createRef, useContext } from 'react';
 import Typography from '@material-ui/core/Typography';
 import { withStyles } from '@material-ui/core/styles';
-import ContentEditable from 'react-contenteditable';
 
+import EditableText from '../components/EditableText';
 import EditModeContext from '../contexts/editMode';
 
 const styles = {
@@ -15,15 +15,13 @@ const styles = {
   }
 };
 
-const AboutMe = ({ classes, paragraph }) => {
-  const [html, setHtml] = useState(paragraph);
+const AboutMe = ({ classes, paragraph, setUpdates }) => {
   const [editMode] = useContext(EditModeContext);
-  const contentEditable = createRef();
-  const handleChange = e => {
-    // TODO: Remove all html??
-    setHtml(e.target.value);
+
+  const requestUpdates = (e, content) => {
+    const updates = { paragraph: content };
+    setUpdates(updates);
   };
-  const handleBlur = () => console.log(html);
 
   return (
     <div>
@@ -35,13 +33,11 @@ const AboutMe = ({ classes, paragraph }) => {
           component="div"
           gutterBottom
         >
-          <ContentEditable
-            innerRef={contentEditable}
-            html={html} // innerHTML of the editable div
-            disabled={!editMode} // use true to disable editing
-            onChange={handleChange} // handle innerHTML change
-            onBlur={handleBlur}
-            tagName="div" // Use a custom HTML tag (uses a div by default)
+          <EditableText
+            initialContent={paragraph}
+            submitCallback={requestUpdates}
+            disabled={!editMode}
+            multiline
           />
         </Typography>
       )}

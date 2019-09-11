@@ -1,4 +1,5 @@
 const path = require('path');
+const webpack = require('webpack');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 
 /**
@@ -6,6 +7,12 @@ const MiniCssExtractPlugin = require('mini-css-extract-plugin');
  * For production, we need a different source map.
  * And no environment values have been set
  **/
+
+process.env.NODE_ENV = process.env.NODE_ENV || 'development';
+
+if (process.env.NODE_ENV === 'development') {
+  require('dotenv').config({ path: path.join(__dirname, '.env.development') });
+}
 
 module.exports = {
   mode: 'development',
@@ -64,7 +71,12 @@ module.exports = {
       }
     ]
   },
-  plugins: [new MiniCssExtractPlugin({ filename: 'bundle.css' })],
+  plugins: [
+    new MiniCssExtractPlugin({ filename: 'bundle.css' }),
+    new webpack.DefinePlugin({
+      'process.env.NODE_HOST': JSON.stringify(process.env.NODE_HOST)
+    })
+  ],
   optimization: {
     splitChunks: {
       cacheGroups: {

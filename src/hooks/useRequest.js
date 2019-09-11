@@ -1,4 +1,4 @@
-import { useReducer, useState } from 'react';
+import { useReducer } from 'react';
 import axios from 'axios';
 
 export const initialState = {
@@ -39,17 +39,19 @@ const failure = data => ({ type: 'FAILURE', data });
 const useRequest = (baseURL = '') => {
   const [state, dispatch] = useReducer(reducer, initialState);
 
-  const makeRequest = async (url, method = 'GET', options = {}) => {
+  const createRequest = async (url, method = 'GET', options = {}) => {
     dispatch(fetching());
     try {
-      const response = await axios({ baseURL, url, method, ...options });
+      const request = { baseURL, url, method, ...options };
+      console.log(request);
+      const response = await axios(request);
       dispatch(success(response.data));
     } catch (e) {
       dispatch(failure(e));
     }
   };
 
-  return [state, makeRequest];
+  return [state, createRequest];
 };
 
 export { useRequest as default, fetching, success, failure };

@@ -1,7 +1,8 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import Box from '@material-ui/core/Box';
 import Container from '@material-ui/core/Container';
 import { withStyles } from '@material-ui/core/styles';
+import { withRouter } from 'react-router-dom';
 
 import SectionProfile from '../components/SectionProfile';
 import SectionJobs from '../components/SectionJobs';
@@ -9,11 +10,10 @@ import SectionStudies from '../components/SectionStudies';
 import SectionCourses from '../components/SectionCourses';
 import Loading from '../components/Loading';
 
-import { withRouter } from 'react-router';
 import useRequest from '../hooks/useRequest';
+import CvContext from '../contexts/cv';
+import AuthContext from '../contexts/auth';
 import { generateBlobURL } from '../utils/utils';
-
-const DOMAIN = `http://localhost:3000`;
 
 const styles = {
   root: {
@@ -22,33 +22,43 @@ const styles = {
   }
 };
 
-const userData = {
-  fullName: 'Ron Broek',
-  profession: 'Web developer',
-  phoneNumber: '+31 (0)6 46 52 3636',
-  email: 'ron@web.dev'
-};
-
 const CV = ({ classes, currentCv }) => {
-  const [response, makeRequest] = useRequest(DOMAIN);
-  const [fileResponse, makeFileRequest] = useRequest(DOMAIN);
+  const [cvResponse, cvRequest] = useRequest(process.env.NODE_HOST);
+  const [fileResponse, fileRequest] = useRequest(process.env.NODE_HOST);
   const [photo, setPhoto] = useState(null);
+  const [auth] = useContext(AuthContext);
 
-  const handleRequest = useCallback(() => makeRequest(`/cvs/${currentCv}`), [currentCv]);
+  const [updates, createUpdateRequest] = useRequest(process.env.NODE_HOST);
+  const requestUpdates = data => {
+    createUpdateRequest(`/cvs/${currentCv}`, 'PATCH', {
+      headers: {
+        authorization: `Bearer ${auth.token}`
+      },
+      data
+    });
+  };
 
-  const handleFileRequest = useCallback(() => {
-    makeFileRequest(`users/${response.data.user}/photo`, 'GET', { responseType: 'blob' });
-  }, [response.status]);
+  const requestProfileUpdates = data => {
+    createUpdateRequest(`/users`, 'PATCH', {
+      headers: {
+        authorization: `Bearer ${auth.token}`
+      },
+      data
+    });
+  };
 
   useEffect(() => {
-    handleRequest();
+    cvRequest(`/cvs/${currentCv}`);
   }, [currentCv]);
 
   useEffect(() => {
-    if (response.status === 'SUCCESS') {
-      handleFileRequest();
+    if (cvResponse.status === 'SUCCESS') {
+      console.log('cvFile', cvResponse);
+      fileRequest(`users/${cvResponse.data.user}/photo`, 'GET', {
+        responseType: 'blob'
+      });
     }
-  }, [response.status]);
+  }, [cvResponse.status]);
 
   useEffect(() => {
     if (fileResponse.status === 'SUCCESS') {
@@ -58,18 +68,20 @@ const CV = ({ classes, currentCv }) => {
 
   return (
     <Container maxWidth="md">
-      {response.status === 'SUCCESS' && (
+      {cvResponse.status === 'SUCCESS' && (
         <Box bgcolor="#EEEEEE" className={classes.root}>
-          <SectionProfile profile={{ ...response.data.profile, ...userData }} photo={photo} />
-          <SectionJobs jobs={response.data.jobs} />
-          <SectionStudies studies={response.data.studies} />
-          <SectionCourses courses={response.data.courses} />
+          <CvContext.Provider value={{ requestUpdates, requestProfileUpdates }}>
+            <SectionProfile profile={{ ...cvResponse.data.profile }} photo={photo} />
+            <SectionJobs jobs={cvResponse.data.jobs} />
+            <SectionStudies studies={cvResponse.data.studies} />
+            <SectionCourses courses={cvResponse.data.courses} />
+          </CvContext.Provider>
         </Box>
       )}
 
-      {response.status === 'FETCHING' && <Loading />}
+      {cvResponse.status === 'FETCHING' && <Loading />}
 
-      {response.status === 'LOADING' && <div>Error!</div>}
+      {cvResponse.status === 'LOADING' && <div>Error!</div>}
     </Container>
   );
 };

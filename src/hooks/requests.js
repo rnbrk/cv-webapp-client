@@ -1,10 +1,8 @@
 import axios from 'axios';
 
-const DOMAIN = `http://localhost:3000`;
-
 const makeRequest = async (location, method, data) =>
   await axios({
-    url: `${DOMAIN}${location}`,
+    url: `${process.env.NODE_HOST}${location}`,
     method,
     data
   });
@@ -14,14 +12,14 @@ const login = async credentials => await makeRequest('/users/login', 'post', cre
 const getCv = async id => await makeRequest(`/cvs/${id}`, 'get');
 
 const getCv2 = async => await axios({
-  url: `${DOMAIN}/cvs/${id}`,
+  url: `${process.env.NODE_HOST}/cvs/${id}`,
   'get'
 });
 
 const getPhoto = async id => {
   try {
     const response = await axios({
-      url: `${DOMAIN}/users/${id}/photo`,
+      url: `${process.env.NODE_HOST}/users/${id}/photo`,
       method: 'get',
       responseType: 'blob'
     });

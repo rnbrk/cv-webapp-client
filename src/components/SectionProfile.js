@@ -1,27 +1,41 @@
-import React from 'react';
+import React, { createContext, useContext, useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 
 import AboutMe from './AboutMe';
 import StyledPaper from './StyledPaper';
+import CvContext from '../contexts/cv';
 import ContactDetails from './ContactDetails';
 import Portrait from './Portrait';
 
 const SectionProfile = ({ profile, photo }) => {
+  const [profileData, setProfileData] = useState(profile);
+  const { requestUpdates, requestProfileUpdates } = useContext(CvContext);
+  const setUpdates = updates => {
+    const newProfile = { ...profileData, ...updates };
+    setProfileData(newProfile);
+
+    // Temporary fix:
+    const onlyParagraph = { paragraph: newProfile.paragraph };
+
+    requestUpdates({ profile: onlyParagraph });
+  };
+
   return (
     <StyledPaper>
       <ContactDetails
-        email={profile.email}
-        phoneNumber={profile.phoneNumber}
-        website={profile.website}
+        email={profileData.email}
+        phoneNumber={profileData.phoneNumber}
+        website={profileData.website}
+        setUpdates={requestProfileUpdates}
       />
       <Portrait
-        name={profile.fullName}
-        title={profile.profession}
-        _id={profile._id}
+        fullName={profileData.fullName}
+        profession={profileData.profession}
+        _id={profileData._id}
         photo={photo}
+        setUpdates={requestProfileUpdates}
       />
-      <div></div>
-      <AboutMe paragraph={profile && profile.paragraph} />
+      <AboutMe paragraph={profileData.paragraph} setUpdates={setUpdates} />
     </StyledPaper>
   );
 };

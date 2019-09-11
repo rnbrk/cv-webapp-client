@@ -27,7 +27,7 @@ const useStyles = makeStyles(theme => ({
 
 const TopBar = ({ currentCv, location, match }) => {
   const [auth, dispatch] = useContext(AuthContext);
-  const [editMode] = useContext(EditModeContext);
+  const [editMode, setEditMode] = useContext(EditModeContext);
   const classes = useStyles();
 
   const ViewMode = props => (

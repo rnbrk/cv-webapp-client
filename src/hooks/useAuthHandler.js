@@ -4,8 +4,6 @@ import moment from 'moment';
 
 import requestReducer from '../reducers/auth';
 
-const DOMAIN = 'http://localhost:3000';
-
 const initialRequest = {
   url: undefined,
   method: undefined,
@@ -125,7 +123,7 @@ function useAuthHandler() {
   async function _refreshAccessToken() {
     try {
       const req = {
-        url: `${DOMAIN}/users/token`,
+        url: `${process.env.NODE_HOST}/users/token`,
         method: 'POST',
         headers: { Authorization: `Bearer ${refreshToken}` },
         data: { email: auth.email }
