@@ -1,10 +1,13 @@
-import React, { useRef } from 'react';
+import React, { useContext, useState, useEffect } from 'react';
 import moment from 'moment';
 
 import Box from '@material-ui/core/Box';
 import Grid from '@material-ui/core/Grid';
 import Typography from '@material-ui/core/Typography';
 import { withStyles } from '@material-ui/core/styles';
+
+import EditableDate from '../components/EditableDate';
+import EditModeContext from '../contexts/editMode';
 
 import { dotMixin, moveUpMixin, centerMixin } from '../styles/mixins';
 import TimelineDivider from './TimelineDivider';
@@ -55,6 +58,7 @@ const styles = {
     position: 'absolute',
     transform: 'translate(-100%, -50%)',
     left: '100%',
+    width: '150px',
     paddingRight: 12
   },
   timelineTextTop: { top: '0%' },
@@ -69,43 +73,70 @@ const Timeline = ({
   omitEndDate,
   topStyle = 'connected',
   bottomStyle = 'connected',
-  dateFormat = 'MMMM YYYY'
-}) => (
-  <Grid
-    item
-    xs={2}
-    container
-    direction="column"
-    justify="flex-end"
-    alignItems="center"
-    className={classes.timelineGrid}
-  >
-    {topStyle == 'divider' && <TimelineDivider height={`${DIVIDER_HEIGHT}%`} />}
+  dateFormat = 'MMMM YYYY',
+  setUpdates
+}) => {
+  const [editMode] = useContext(EditModeContext);
+  const [state, setState] = useState({ startDate, endDate });
 
-    <Box className={classes.timeline}>
-      {!omitEndDate && (
-        <Typography
-          variant="body2"
-          align="right"
-          className={`${classes.timelineText} ${classes.timelineTextTop}`}
-        >
-          {moment(endDate).format(dateFormat)}
-        </Typography>
-      )}
+  const setDate = type => date => {
+    const newState = { ...state, [type]: date.toISOString() };
+    setState(newState);
+    setUpdates(newState);
+  };
 
-      {!omitStartDate && (
-        <Typography
-          variant="body2"
-          align="right"
-          className={`${classes.timelineText} ${classes.timelineTextBottom}`}
-        >
-          {moment(startDate).format(dateFormat)}
-        </Typography>
-      )}
-    </Box>
+  const setEndDate = setDate('endDate');
+  const setStartDate = setDate('startDate');
 
-    {bottomStyle === 'divider' && <TimelineDivider height={`${DIVIDER_HEIGHT}%`} />}
-  </Grid>
-);
+  return (
+    <Grid
+      item
+      xs={2}
+      container
+      direction="column"
+      justify="flex-end"
+      alignItems="center"
+      className={classes.timelineGrid}
+    >
+      {topStyle == 'divider' && <TimelineDivider height={`${DIVIDER_HEIGHT}%`} />}
+
+      <Box className={classes.timeline}>
+        {!omitEndDate && (
+          <Typography
+            variant="body2"
+            align="right"
+            component="span"
+            className={`${classes.timelineText} ${classes.timelineTextTop}`}
+          >
+            <EditableDate
+              initialDate={endDate}
+              disabled={!editMode}
+              format={dateFormat}
+              submitCallback={setEndDate}
+            />
+          </Typography>
+        )}
+
+        {!omitStartDate && (
+          <Typography
+            variant="body2"
+            align="right"
+            component="span"
+            className={`${classes.timelineText} ${classes.timelineTextBottom}`}
+          >
+            <EditableDate
+              initialDate={startDate}
+              disabled={!editMode}
+              format={dateFormat}
+              submitCallback={setStartDate}
+            />
+          </Typography>
+        )}
+      </Box>
+
+      {bottomStyle === 'divider' && <TimelineDivider height={`${DIVIDER_HEIGHT}%`} />}
+    </Grid>
+  );
+};
 
 export default withStyles(styles)(Timeline);

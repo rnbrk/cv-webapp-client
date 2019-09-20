@@ -27,6 +27,17 @@ const ItemStudy = ({ classes, study, setUpdates }) => {
     setUpdates(newState);
   };
 
+  const updateDates = ({ startDate, endDate }) => {
+    const newState = {
+      ...state,
+      startDate,
+      endDate
+    };
+
+    setState(newState);
+    setUpdates(newState);
+  };
+
   return (
     <article className={classes.totalItem}>
       <Grid container alignItems="stretch">
@@ -36,6 +47,7 @@ const ItemStudy = ({ classes, study, setUpdates }) => {
           topStyle="unconnected"
           bottomStyle="unconnected"
           dateFormat="YYYY"
+          setUpdates={updateDates}
         />
         <Grid item xs={10} className={classes.textPart}>
           <TitleItem

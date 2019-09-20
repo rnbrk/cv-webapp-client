@@ -32,7 +32,17 @@ const ItemJob = ({ job, classes, timelineStyles, setUpdates }) => {
       ...state,
       [id]: content
     };
-    console.log('newState', newState);
+    setState(newState);
+    setUpdates(newState);
+  };
+
+  const updateDates = ({ startDate, endDate }) => {
+    const newState = {
+      ...state,
+      startDate,
+      endDate
+    };
+
     setState(newState);
     setUpdates(newState);
   };
@@ -49,18 +59,23 @@ const ItemJob = ({ job, classes, timelineStyles, setUpdates }) => {
   return (
     <article>
       <Grid container alignItems="stretch">
-        <Timeline startDate={job.startDate} endDate={job.endDate} {...timelineStyles} />
+        <Timeline
+          startDate={state.startDate}
+          endDate={state.endDate}
+          setUpdates={updateDates}
+          {...timelineStyles}
+        />
         <Grid item xs={10} className={classes.jobItem}>
           <TitleItem
-            title={job.name}
-            subtitle={job.employerName}
+            title={state.name}
+            subtitle={state.employerName}
             titleName="name"
             subtitleName="employerName"
             setUpdates={updateJob}
           />
           <Typography variant="body1" align="left" component="span">
             <EditableText
-              initialContent={job.description}
+              initialContent={state.description}
               submitCallback={updateJob}
               disabled={!editMode}
               id="description"
