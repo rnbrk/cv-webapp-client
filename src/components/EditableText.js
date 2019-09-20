@@ -30,6 +30,7 @@ const EditableText = ({
     setContent(e.target.value || null);
     if (changeCallback) changeCallback(e, content, id);
   };
+
   const handleBlur = e => {
     if (submitCallback) submitCallback(e, content, id);
   };
@@ -55,17 +56,3 @@ const EditableText = ({
 };
 
 export default withStyles(styles)(EditableText);
-
-/*
-    <ContentEditable
-      innerRef={contentEditable}
-      html={content}
-      disabled={disabled}
-      onChange={handleChange}
-      onBlur={handleBlur}
-      tagName={tagName}
-      id={id}
-    />
-
-
-    */

@@ -36,18 +36,19 @@ const failure = data => ({ type: 'FAILURE', data });
  * Simple hook to make requests, can initialize with base url (domain)
  * and make requests with different urls and options
  */
-const useRequest = (baseURL = '') => {
+const useRequest = (baseURL = '', cancel = () => {}) => {
   const [state, dispatch] = useReducer(reducer, initialState);
 
   const createRequest = async (url, method = 'GET', options = {}) => {
     dispatch(fetching());
     try {
       const request = { baseURL, url, method, ...options };
-      console.log(request);
+      console.log('request', request);
       const response = await axios(request);
-      dispatch(success(response.data));
+
+      if (!cancel()) dispatch(success(response.data));
     } catch (e) {
-      dispatch(failure(e));
+      if (!cancel()) dispatch(failure(e));
     }
   };
 

@@ -15,7 +15,7 @@ const styles = {
   }
 };
 
-const ContactDetail = ({ classes, text, Icon, href, id, editable = true, requestUpdates }) => {
+const ContactDetail = ({ classes, text, Icon, href, id, editable = true, setUpdates }) => {
   return (
     <Grid item container xs direction="row" justify="center" alignItems="center">
       <Icon color="primary" className={classes.infoIcon} />
@@ -25,12 +25,11 @@ const ContactDetail = ({ classes, text, Icon, href, id, editable = true, request
           <div>wtf</div>
         </Link>
       ) : (
-        <Typography variant="body1">
+        <Typography variant="body1" component={'span'}>
           <EditableText
             initialContent={text}
-            submitCallback={requestUpdates}
+            submitCallback={setUpdates}
             disabled={!editable}
-            tagName="span"
             id={id}
           />
         </Typography>

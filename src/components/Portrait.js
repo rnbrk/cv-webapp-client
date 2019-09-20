@@ -30,17 +30,6 @@ const styles = {
 
 const Portrait = ({ classes, fullName, profession, photo, setUpdates }) => {
   const [editMode] = useContext(EditModeContext);
-  const [state, setState] = useState({ fullName, profession });
-
-  const requestUpdates = (e, content, id) => {
-    const newState = {
-      ...state,
-      [id]: content
-    };
-    setState(newState);
-    setUpdates(newState);
-  };
-
   return (
     <Box className={classes.portrait}>
       {photo ? (
@@ -53,10 +42,9 @@ const Portrait = ({ classes, fullName, profession, photo, setUpdates }) => {
         <Typography variant="h1" align="center">
           <EditableText
             initialContent={fullName}
-            submitCallback={requestUpdates}
+            submitCallback={setUpdates}
             disabled={!editMode}
             id="fullName"
-            tagName="span"
           />
         </Typography>
       )}
@@ -65,10 +53,9 @@ const Portrait = ({ classes, fullName, profession, photo, setUpdates }) => {
         <Typography variant="subtitle1" align="center" color="primary" gutterBottom>
           <EditableText
             initialContent={profession}
-            submitCallback={requestUpdates}
+            submitCallback={setUpdates}
             disabled={!editMode}
             id="profession"
-            tagName="span"
           />
         </Typography>
       )}

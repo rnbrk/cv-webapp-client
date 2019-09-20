@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import Grid from '@material-ui/core/Grid';
 import { withStyles } from '@material-ui/core/styles';
 
@@ -15,25 +15,41 @@ const styles = {
   }
 };
 
-const ItemStudy = ({ classes, study }) => (
-  <article className={classes.totalItem}>
-    <Grid container alignItems="stretch">
-      <Timeline
-        startDate={study.startDate}
-        endDate={study.endDate}
-        topStyle="unconnected"
-        bottomStyle="unconnected"
-        dateFormat="YYYY"
-      />
-      <Grid item xs={10} className={classes.textPart}>
-        <TitleItem
-          title={`${study.title} ${study.name}`}
-          subtitle={study.instituteName}
-          gutterBottom={false}
+const ItemStudy = ({ classes, study, setUpdates }) => {
+  const [state, setState] = useState(study);
+
+  const update = (e, content, id) => {
+    const newState = {
+      ...state,
+      [id]: content
+    };
+    setState(newState);
+    setUpdates(newState);
+  };
+
+  return (
+    <article className={classes.totalItem}>
+      <Grid container alignItems="stretch">
+        <Timeline
+          startDate={state.startDate}
+          endDate={state.endDate}
+          topStyle="unconnected"
+          bottomStyle="unconnected"
+          dateFormat="YYYY"
         />
+        <Grid item xs={10} className={classes.textPart}>
+          <TitleItem
+            title={state.name}
+            subtitle={state.instituteName}
+            titleName="name"
+            subtitleName="instituteName"
+            gutterBottom={false}
+            setUpdates={update}
+          />
+        </Grid>
       </Grid>
-    </Grid>
-  </article>
-);
+    </article>
+  );
+};
 
 export default withStyles(styles)(ItemStudy);

@@ -30,33 +30,25 @@ const TopBar = ({ currentCv, location, match }) => {
   const [editMode, setEditMode] = useContext(EditModeContext);
   const classes = useStyles();
 
+  const loginAction = () => dispatch(login({ email: 'ron@web.dev', password: '12345abc' }));
+  const logoutAction = () => dispatch(logout());
+  const createUserAction = () =>
+    dispatch(createUser({ email: 'support@microsoft.com', password: 'b1llg4t3zZz' }));
+
   const ViewMode = props => (
     <Box>
       {auth._id ? (
         <Box>
-          <Button
-            color="inherit"
-            onClick={() => {
-              dispatch(logout());
-            }}
-          >
+          <Button color="inherit" onClick={logoutAction}>
             Log out
           </Button>
         </Box>
       ) : (
         <Box>
-          <Button
-            color="inherit"
-            onClick={() => dispatch(login({ email: 'ron@web.dev', password: '12345abc' }))}
-          >
+          <Button color="inherit" onClick={loginAction}>
             Log in
           </Button>
-          <Button
-            color="inherit"
-            onClick={() => {
-              dispatch(createUser({ email: 'support@microsoft.com', password: 'b1llg4t3zZz' }));
-            }}
-          >
+          <Button color="inherit" onClick={createUserAction}>
             Sign up
           </Button>
         </Box>
@@ -83,12 +75,7 @@ const TopBar = ({ currentCv, location, match }) => {
           component={Link}
           to={`/cvs/${currentCv}`}
           color="inherit"
-          onClick={() => {
-            dispatch(logout());
-            // setTimeout(() => {
-            //   dispatch(logout());
-            // }, 1000);
-          }}
+          onClick={logoutAction}
         >
           Log out
         </Button>
@@ -119,11 +106,11 @@ const TopBar = ({ currentCv, location, match }) => {
           <Typography variant="h6" className={classes.title}>
             CV Web app
           </Typography>
-          {editMode ? <EditMode /> : <ViewMode />}
+          {editMode ? EditMode() : ViewMode()}
         </Toolbar>
       </AppBar>
 
-      {editMode && auth._id && <EditModeMenuTabs />}
+      {editMode && auth._id && EditModeMenuTabs()}
     </div>
   );
 };

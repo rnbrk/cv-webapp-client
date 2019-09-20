@@ -8,34 +8,52 @@ import ContactDetails from './ContactDetails';
 import Portrait from './Portrait';
 
 const SectionProfile = ({ profile, photo }) => {
-  const [profileData, setProfileData] = useState(profile);
-  const { requestUpdates, requestProfileUpdates } = useContext(CvContext);
-  const setUpdates = updates => {
-    const newProfile = { ...profileData, ...updates };
-    setProfileData(newProfile);
+  const [state, setState] = useState(profile);
+  const { requestUpdatesCvModel, requestUpdatesUserModel } = useContext(CvContext);
 
-    // Temporary fix:
-    const onlyParagraph = { paragraph: newProfile.paragraph };
+  const setUpdatesToUserModel = (e, content, id) => {
+    const newState = {
+      ...state,
+      [id]: content
+    };
+    setState(newState);
 
-    requestUpdates({ profile: onlyParagraph });
+    // Temporary fix
+    // This requires a change in the backend to fix correctly
+    const newProfileDataWithoutParagraph = { ...newState };
+    delete newProfileDataWithoutParagraph.paragraph;
+    delete newProfileDataWithoutParagraph.title;
+
+    requestUpdatesUserModel(newProfileDataWithoutParagraph);
+  };
+
+  const setUpdatesToCvModel = updates => {
+    const newState = { ...state, ...updates };
+    setState(newState);
+
+    // Temporary fix
+    // This requires a change in the backend to fix correctly
+    const onlyParagraph = { paragraph: newState.paragraph };
+
+    requestUpdatesCvModel({ profile: onlyParagraph });
   };
 
   return (
     <StyledPaper>
       <ContactDetails
-        email={profileData.email}
-        phoneNumber={profileData.phoneNumber}
-        website={profileData.website}
-        setUpdates={requestProfileUpdates}
+        email={state.email}
+        phoneNumber={state.phoneNumber}
+        website={state.website}
+        setUpdates={setUpdatesToUserModel}
       />
       <Portrait
-        fullName={profileData.fullName}
-        profession={profileData.profession}
-        _id={profileData._id}
+        fullName={state.fullName}
+        profession={state.profession}
+        _id={state._id}
         photo={photo}
-        setUpdates={requestProfileUpdates}
+        setUpdates={setUpdatesToUserModel}
       />
-      <AboutMe paragraph={profileData.paragraph} setUpdates={setUpdates} />
+      <AboutMe paragraph={state.paragraph} setUpdates={setUpdatesToCvModel} />
     </StyledPaper>
   );
 };

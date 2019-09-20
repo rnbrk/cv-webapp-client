@@ -2,7 +2,6 @@
  * Reduces the action into a request object to make an API request
  */
 const requestReducer = (state, action) => {
-  console.log(action);
   switch (action.type) {
     case 'LOGIN':
       return {

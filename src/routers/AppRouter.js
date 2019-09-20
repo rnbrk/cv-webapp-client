@@ -11,37 +11,40 @@ import AuthContext from '../contexts/auth';
 import EditModeContext from '../contexts/editMode';
 import { getBooleanFromUrlQuery } from '../utils/utils';
 
-const AppRouter = () => {
+const mainPage = ({ match, location }) => {
+  const [auth, dispatch] = useAuthHandler();
+  const [editMode, setEditMode] = useState(getBooleanFromUrlQuery(location.search, 'edit'));
+
+  useEffect(() => {
+    setEditMode(getBooleanFromUrlQuery(location.search, 'edit'));
+  }, [location.search]);
+
+  return (
+    <EditModeContext.Provider value={[editMode, setEditMode]}>
+      <AuthContext.Provider value={[auth, dispatch]}>
+        <TopBar
+          currentCv={match.params.id}
+          search={location.search}
+          location={location}
+          match={match}
+        />
+        <CV currentCv={match.params.id} />
+      </AuthContext.Provider>
+    </EditModeContext.Provider>
+  );
+};
+
+const loginPage = () => {
   const [auth, dispatch] = useAuthHandler();
 
-  const mainPage = ({ match, location }) => {
-    const [editMode, setEditMode] = useState(getBooleanFromUrlQuery(location.search, 'edit'));
-
-    useEffect(() => {
-      setEditMode(getBooleanFromUrlQuery(location.search, 'edit'));
-    }, [location.search]);
-
-    return (
-      <EditModeContext.Provider value={[editMode, setEditMode]}>
-        <AuthContext.Provider value={[auth, dispatch]}>
-          <TopBar
-            currentCv={match.params.id}
-            search={location.search}
-            location={location}
-            match={match}
-          />
-          <CV currentCv={match.params.id} />
-        </AuthContext.Provider>
-      </EditModeContext.Provider>
-    );
-  };
-
-  const loginPage = () => (
+  return (
     <AuthContext.Provider value={[auth, dispatch]}>
       <ScreenLogin />
     </AuthContext.Provider>
   );
+};
 
+const AppRouter = () => {
   return (
     <Router history={history}>
       <Switch>
@@ -55,74 +58,3 @@ const AppRouter = () => {
 };
 
 export default AppRouter;
-
-/**
- * NEW INTEGRATED VERSION
- */
-
-/*
- 
-<Route path="" exact component={} />
-          <PrivateRoute path="/edit" exact isAuthenticated={!!auth._id} component={} />
-
- */
-
-/**
- * VIEW MODE
- */
-
-/*
-
-<Route
-            path="/cvs/:id"
-            exact
-            component={({ match }) => {
-              console.log('match View mode', match.params.id);
-
-              return (
-                <div>
-                  <CurrentCvContext.Provider value={match.params.id}>
-                    <AuthContext.Provider value={[auth, dispatch]}>
-                      <EditModeContext.Provider value={false}>
-                        <TopBar />
-                      </EditModeContext.Provider>
-                    </AuthContext.Provider>
-                  </CurrentCvContext.Provider>
-                  <CV currentCv={match.params.id} />
-                </div>
-              );
-            }}
-          />
-
-
- */
-
-/**
- * EDIT MODE
- */
-/*
-
-        <AuthContext.Provider value={[auth, dispatch]}>
-            <PrivateRoute
-              path="/cvs/:id/edit"
-              exact
-              Component={({ match }) => {
-                console.log('match Edit mode', match.params.id);
-
-                return (
-                  <div>
-                    <CurrentCvContext.Provider value={match.params.id}>
-                      <AuthContext.Provider value={[auth, dispatch]}>
-                        <EditModeContext.Provider value={true}>
-                          <TopBar />
-                        </EditModeContext.Provider>
-                      </AuthContext.Provider>
-                    </CurrentCvContext.Provider>
-                    <CV currentCv={match.params.id} />
-                  </div>
-                );
-              }}
-            />
-          </AuthContext.Provider>
-
-          */

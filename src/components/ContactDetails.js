@@ -6,7 +6,7 @@ import Link from '@material-ui/icons/Link';
 import { withStyles } from '@material-ui/core/styles';
 
 import ContactDetail from './ContactDetail';
-import EditableText from '../components/EditableText';
+
 import EditModeContext from '../contexts/editMode';
 
 const styles = {
@@ -19,18 +19,7 @@ const styles = {
 };
 
 const ContactDetails = ({ classes, email, phoneNumber, website, setUpdates }) => {
-  const [state, setState] = useState({ email, phoneNumber, website });
   const [editMode] = useContext(EditModeContext);
-
-  const requestUpdates = (e, content, id) => {
-    const newState = {
-      ...state,
-      [id]: content
-    };
-    console.log('newState', newState);
-    setState(newState);
-    setUpdates(newState);
-  };
 
   return (
     <Grid container className={classes.infoBar}>
@@ -39,7 +28,7 @@ const ContactDetails = ({ classes, email, phoneNumber, website, setUpdates }) =>
           text={email}
           Icon={AlternateEmail}
           id="email"
-          requestUpdates={requestUpdates}
+          setUpdates={setUpdates}
           editable={false}
         />
       )}
@@ -48,7 +37,7 @@ const ContactDetails = ({ classes, email, phoneNumber, website, setUpdates }) =>
           text={phoneNumber}
           Icon={LocalPhone}
           id="phoneNumber"
-          requestUpdates={requestUpdates}
+          setUpdates={setUpdates}
           editable={editMode}
         />
       )}

@@ -40,7 +40,6 @@ function useAuthHandler() {
     }
 
     setAuth({ ...initialAuth, status: 'FETCHING' });
-
     try {
       const res = await axios(req);
 

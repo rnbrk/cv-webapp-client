@@ -38,6 +38,7 @@ const AboutMe = ({ classes, paragraph, setUpdates }) => {
             submitCallback={requestUpdates}
             disabled={!editMode}
             multiline
+            id="paragraph"
           />
         </Typography>
       )}

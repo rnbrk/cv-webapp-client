@@ -27,9 +27,9 @@ const CV = ({ classes, currentCv }) => {
   const [fileResponse, fileRequest] = useRequest(process.env.NODE_HOST);
   const [photo, setPhoto] = useState(null);
   const [auth] = useContext(AuthContext);
-
   const [updates, createUpdateRequest] = useRequest(process.env.NODE_HOST);
-  const requestUpdates = data => {
+
+  const requestUpdatesCvModel = data => {
     createUpdateRequest(`/cvs/${currentCv}`, 'PATCH', {
       headers: {
         authorization: `Bearer ${auth.token}`
@@ -38,7 +38,7 @@ const CV = ({ classes, currentCv }) => {
     });
   };
 
-  const requestProfileUpdates = data => {
+  const requestUpdatesUserModel = data => {
     createUpdateRequest(`/users`, 'PATCH', {
       headers: {
         authorization: `Bearer ${auth.token}`
@@ -48,16 +48,28 @@ const CV = ({ classes, currentCv }) => {
   };
 
   useEffect(() => {
+    // let didCancel = false;
+    // const cleanUp = () => (didCancel = true);
     cvRequest(`/cvs/${currentCv}`);
-  }, [currentCv]);
+
+    // return cleanUp;
+  }, []);
 
   useEffect(() => {
+    let didCancel = false;
+    const cleanUp = () => (didCancel = true);
+
     if (cvResponse.status === 'SUCCESS') {
-      console.log('cvFile', cvResponse);
-      fileRequest(`users/${cvResponse.data.user}/photo`, 'GET', {
-        responseType: 'blob'
-      });
+      fileRequest(
+        `users/${cvResponse.data.user}/photo`,
+        'GET',
+        {
+          responseType: 'blob'
+        },
+        cleanUp
+      );
     }
+    return cleanUp;
   }, [cvResponse.status]);
 
   useEffect(() => {
@@ -70,7 +82,7 @@ const CV = ({ classes, currentCv }) => {
     <Container maxWidth="md">
       {cvResponse.status === 'SUCCESS' && (
         <Box bgcolor="#EEEEEE" className={classes.root}>
-          <CvContext.Provider value={{ requestUpdates, requestProfileUpdates }}>
+          <CvContext.Provider value={{ requestUpdatesCvModel, requestUpdatesUserModel }}>
             <SectionProfile profile={{ ...cvResponse.data.profile }} photo={photo} />
             <SectionJobs jobs={cvResponse.data.jobs} />
             <SectionStudies studies={cvResponse.data.studies} />
@@ -86,4 +98,4 @@ const CV = ({ classes, currentCv }) => {
   );
 };
 
-export default withStyles(styles)(withRouter(CV));
+export default withStyles(styles)(CV);
