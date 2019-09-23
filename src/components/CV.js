@@ -2,7 +2,6 @@ import React, { useContext, useEffect, useState } from 'react';
 import Box from '@material-ui/core/Box';
 import Container from '@material-ui/core/Container';
 import { withStyles } from '@material-ui/core/styles';
-import { withRouter } from 'react-router-dom';
 
 import SectionProfile from '../components/SectionProfile';
 import SectionJobs from '../components/SectionJobs';
@@ -27,10 +26,10 @@ const CV = ({ classes, currentCv }) => {
   const [fileResponse, fileRequest] = useRequest(process.env.NODE_HOST);
   const [photo, setPhoto] = useState(null);
   const [auth] = useContext(AuthContext);
-  const [updates, createUpdateRequest] = useRequest(process.env.NODE_HOST);
+  const [response, makeRequest] = useRequest(process.env.NODE_HOST);
 
   const requestUpdatesCvModel = data => {
-    createUpdateRequest(`/cvs/${currentCv}`, 'PATCH', {
+    makeRequest(`/cvs/${currentCv}`, 'PATCH', {
       headers: {
         authorization: `Bearer ${auth.token}`
       },
@@ -39,7 +38,7 @@ const CV = ({ classes, currentCv }) => {
   };
 
   const requestUpdatesUserModel = data => {
-    createUpdateRequest(`/users`, 'PATCH', {
+    makeRequest(`/users`, 'PATCH', {
       headers: {
         authorization: `Bearer ${auth.token}`
       },
@@ -82,7 +81,7 @@ const CV = ({ classes, currentCv }) => {
     <Container maxWidth="md">
       {cvResponse.status === 'SUCCESS' && (
         <Box bgcolor="#EEEEEE" className={classes.root}>
-          <CvContext.Provider value={{ requestUpdatesCvModel, requestUpdatesUserModel }}>
+          <CvContext.Provider value={{ requestUpdatesCvModel, requestUpdatesUserModel, currentCv }}>
             <SectionProfile profile={{ ...cvResponse.data.profile }} photo={photo} />
             <SectionJobs jobs={cvResponse.data.jobs} />
             <SectionStudies studies={cvResponse.data.studies} />

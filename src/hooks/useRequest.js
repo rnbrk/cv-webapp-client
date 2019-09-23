@@ -46,7 +46,10 @@ const useRequest = (baseURL = '', cancel = () => {}) => {
       console.log('request', request);
       const response = await axios(request);
 
-      if (!cancel()) dispatch(success(response.data));
+      if (!cancel()) {
+        dispatch(success(response.data));
+        return response.data;
+      }
     } catch (e) {
       if (!cancel()) dispatch(failure(e));
     }

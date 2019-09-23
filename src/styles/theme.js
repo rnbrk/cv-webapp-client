@@ -3,15 +3,22 @@ import { createMuiTheme } from '@material-ui/core/styles';
 const htmlElem = document.querySelector('html');
 htmlElem.style.backgroundColor = '#2196F3';
 
+export const primaryColor = '#2196F3';
+export const secondaryColor = '#FF9900';
+export const errorColor = '#FF6666';
+export const textColor = '#444444';
+export const paperColor = '#fcfcfc';
+export const white = '#ffffff';
+
 const theme = createMuiTheme({
   palette: {
-    primary: { main: '#2196F3' },
-    secondary: { main: '#FF9900' },
-    error: { main: '#FF6666' },
-    text: { primary: '#444444' },
+    primary: { main: primaryColor },
+    secondary: { main: secondaryColor },
+    error: { main: errorColor },
+    text: { primary: textColor },
     background: {
-      paper: '#fcfcfc',
-      default: '#ffffff'
+      paper: paperColor,
+      default: white
     }
   },
 
