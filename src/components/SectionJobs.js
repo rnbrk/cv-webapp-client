@@ -44,20 +44,31 @@ const SectionJobs = ({ jobs, classes }) => {
     setState(newState);
   };
 
-  const deleteJob = id => {
+  const deleteJob = async id => {
     const newListOfJobs = state.list.filter(job => job._id !== id);
     const newState = { ...state, list: newListOfJobs };
 
+    await makeRequest(`/cvs/${currentCv}/jobs/${id}`, 'DELETE', {
+      headers: {
+        authorization: `Bearer ${auth.token}`
+      }
+    });
+
     setState(newState);
-    requestUpdatesCvModel({ jobs: newState });
   };
 
-  const updateJob = update => {
+  const updateJob = async update => {
     const newListOfJobs = state.list.filter(job => job._id !== update._id).concat(update);
     const newState = { ...state, list: newListOfJobs };
 
+    await makeRequest(`/cvs/${currentCv}/jobs/${update._id}`, 'PATCH', {
+      headers: {
+        authorization: `Bearer ${auth.token}`
+      },
+      data: update
+    });
+
     setState(newState);
-    requestUpdatesCvModel({ jobs: newState });
   };
 
   const updateTitle = (e, content, id) => {

@@ -60,7 +60,6 @@ const ItemJob = ({ job, classes, timelineStyles, setUpdates, deleteJob }) => {
   };
 
   const deleteRespo = respoIndex => {
-    console.log('Deleted respo');
     const newState = {
       ...state,
       responsibilities: job.responsibilities.filter((respo, index) => index !== respoIndex)
