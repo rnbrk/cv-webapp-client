@@ -1,5 +1,8 @@
 import React, { useContext, useEffect, useState } from 'react';
+import history from '../routers/history';
 import Box from '@material-ui/core/Box';
+import Grid from '@material-ui/core/Grid';
+import Button from '@material-ui/core/Button';
 import Container from '@material-ui/core/Container';
 import { withStyles } from '@material-ui/core/styles';
 
@@ -10,7 +13,9 @@ import SectionCourses from '../components/SectionCourses';
 import Loading from '../components/Loading';
 
 import useRequest from '../hooks/useRequest';
-import CvContext from '../contexts/cv';
+import CurrentCvContext from '../contexts/currentCv';
+import EditModeContext from '../contexts/editMode';
+import CvsContext from '../contexts/cvs';
 import AuthContext from '../contexts/auth';
 import { generateBlobURL } from '../utils/utils';
 
@@ -27,6 +32,22 @@ const CV = ({ classes, currentCv }) => {
   const [photo, setPhoto] = useState(null);
   const [auth] = useContext(AuthContext);
   const [response, makeRequest] = useRequest(process.env.NODE_HOST);
+  const [editMode] = useContext(EditModeContext);
+  const [cvs, setCvs] = useContext(CvsContext);
+
+  const deleteCv = async () => {
+    const newListOfCvs = cvs.filter(cv => cv._id !== currentCv);
+    const nextCvId = newListOfCvs[0]._id;
+
+    await makeRequest(`/cvs/${currentCv}`, 'DELETE', {
+      headers: {
+        authorization: `Bearer ${auth.token}`
+      }
+    });
+
+    setCvs(newListOfCvs);
+    history.push(`/cvs/${nextCvId}?edit=true`);
+  };
 
   const requestUpdatesCvModel = data => {
     makeRequest(`/cvs/${currentCv}`, 'PATCH', {
@@ -47,12 +68,8 @@ const CV = ({ classes, currentCv }) => {
   };
 
   useEffect(() => {
-    // let didCancel = false;
-    // const cleanUp = () => (didCancel = true);
     cvRequest(`/cvs/${currentCv}`);
-
-    // return cleanUp;
-  }, []);
+  }, [currentCv]);
 
   useEffect(() => {
     let didCancel = false;
@@ -81,12 +98,27 @@ const CV = ({ classes, currentCv }) => {
     <Container maxWidth="md">
       {cvResponse.status === 'SUCCESS' && (
         <Box bgcolor="#EEEEEE" className={classes.root}>
-          <CvContext.Provider value={{ requestUpdatesCvModel, requestUpdatesUserModel, currentCv }}>
+          <CurrentCvContext.Provider
+            value={{ requestUpdatesCvModel, requestUpdatesUserModel, currentCv }}
+          >
             <SectionProfile profile={{ ...cvResponse.data.profile }} photo={photo} />
             <SectionJobs jobs={cvResponse.data.jobs} />
             <SectionStudies studies={cvResponse.data.studies} />
             <SectionCourses courses={cvResponse.data.courses} />
-          </CvContext.Provider>
+          </CurrentCvContext.Provider>
+
+          {editMode ? (
+            <Grid justify="center" container>
+              <Button
+                variant="contained"
+                color="secondary"
+                aria-label="Delete resume"
+                onClick={deleteCv}
+              >
+                Delete this resume
+              </Button>
+            </Grid>
+          ) : null}
         </Box>
       )}
 

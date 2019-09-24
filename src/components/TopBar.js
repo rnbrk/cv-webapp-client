@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useContext, useState } from 'react';
 import { Link, Redirect } from 'react-router-dom';
 import Box from '@material-ui/core/Box';
 import Button from '@material-ui/core/Button';
@@ -10,6 +10,9 @@ import Typography from '@material-ui/core/Typography';
 import EditModeContext from '../contexts/editMode';
 import MenuTabs from './MenuTabs';
 import AuthContext from '../contexts/auth';
+import CvsContext from '../contexts/cvs';
+import useRequest from '../hooks/useRequest';
+import CurrentCvContext from '../contexts/currentCv';
 import { login, logout, createUser } from '../actions/auth';
 
 const useStyles = makeStyles(theme => ({
@@ -28,12 +31,25 @@ const useStyles = makeStyles(theme => ({
 const TopBar = ({ currentCv, location, match }) => {
   const [auth, dispatch] = useContext(AuthContext);
   const [editMode, setEditMode] = useContext(EditModeContext);
+  const [cvs, setCvs] = useContext(CvsContext);
+
   const classes = useStyles();
+  const [response, makeRequest] = useRequest(process.env.NODE_HOST);
 
   const loginAction = () => dispatch(login({ email: 'ron@web.dev', password: '12345abc' }));
   const logoutAction = () => dispatch(logout());
   const createUserAction = () =>
     dispatch(createUser({ email: 'support@microsoft.com', password: 'b1llg4t3zZz' }));
+
+  const createCv = async () => {
+    const newCv = await makeRequest(`/cvs`, 'POST', {
+      headers: {
+        authorization: `Bearer ${auth.token}`
+      }
+    });
+
+    setCvs(oldState => oldState.concat([newCv]));
+  };
 
   const ViewMode = props => (
     <Box>
@@ -90,8 +106,9 @@ const TopBar = ({ currentCv, location, match }) => {
     <MenuTabs
       location={location}
       match={match}
-      items={auth.cvs || []}
-      initialValue={auth.cvs || auth.cvs.findIndex(item => auth.cvs._id === currentCv)}
+      items={cvs || []}
+      initialValue={cvs || cvs.findIndex(cv => cv._id === currentCv)}
+      createItem={createCv}
     />
   );
 

@@ -3,13 +3,13 @@ import PropTypes from 'prop-types';
 
 import AboutMe from './AboutMe';
 import StyledPaper from './StyledPaper';
-import CvContext from '../contexts/cv';
+import CurrentCvContext from '../contexts/currentCv';
 import ContactDetails from './ContactDetails';
 import Portrait from './Portrait';
 
 const SectionProfile = ({ profile, photo }) => {
   const [state, setState] = useState(profile);
-  const { requestUpdatesCvModel, requestUpdatesUserModel } = useContext(CvContext);
+  const { requestUpdatesCvModel, requestUpdatesUserModel } = useContext(CurrentCvContext);
 
   const setUpdatesToUserModel = (e, content, id) => {
     const newState = {

@@ -10,12 +10,12 @@ import ItemStudy from './ItemStudy';
 
 import useRequest from '../hooks/useRequest';
 import EditModeContext from '../contexts/editMode';
-import CvContext from '../contexts/cv';
+import CurrentCvContext from '../contexts/currentCv';
 import AuthContext from '../contexts/auth';
 import { compareDateRange } from '../utils/compare';
 
 const SectionStudies = ({ studies }) => {
-  const { requestUpdatesCvModel, currentCv } = useContext(CvContext);
+  const { requestUpdatesCvModel, currentCv } = useContext(CurrentCvContext);
   const [editMode] = useContext(EditModeContext);
   const [auth] = useContext(AuthContext);
 

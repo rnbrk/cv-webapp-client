@@ -14,7 +14,7 @@ import StyledPaper from './StyledPaper';
 import TitleSection from './TitleSection';
 import ItemJob from './ItemJob';
 
-import CvContext from '../contexts/cv';
+import CurrentCvContext from '../contexts/currentCv';
 import AuthContext from '../contexts/auth';
 import EditModeContext from '../contexts/editMode';
 
@@ -27,7 +27,7 @@ const styles = {
 
 const SectionJobs = ({ jobs, classes }) => {
   const [state, setState] = useState(jobs);
-  const { requestUpdatesCvModel, requestCreateJob, currentCv } = useContext(CvContext);
+  const { requestUpdatesCvModel, requestCreateJob, currentCv } = useContext(CurrentCvContext);
   const [response, makeRequest] = useRequest(process.env.NODE_HOST);
   const [auth] = useContext(AuthContext);
   const [editMode] = useContext(EditModeContext);

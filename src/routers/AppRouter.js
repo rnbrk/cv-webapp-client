@@ -8,29 +8,41 @@ import NotFound from '../components/NotFound';
 import ScreenLogin from '../components/ScreenLogin';
 import useAuthHandler from '../hooks/useAuthHandler';
 import AuthContext from '../contexts/auth';
+import CvsContext from '../contexts/cvs';
 import EditModeContext from '../contexts/editMode';
 import { getBooleanFromUrlQuery } from '../utils/utils';
 
 const mainPage = ({ match, location }) => {
   const [auth, dispatch] = useAuthHandler();
   const [editMode, setEditMode] = useState(getBooleanFromUrlQuery(location.search, 'edit'));
+  const [cvs, setCvs] = useState([]);
+
+  useEffect(() => {
+    setCvs(auth.cvs);
+  }, [auth.cvs]);
+
+  useEffect(() => {
+    console.log('cvs', cvs);
+  }, [cvs]);
 
   useEffect(() => {
     setEditMode(getBooleanFromUrlQuery(location.search, 'edit'));
   }, [location.search]);
 
   return (
-    <EditModeContext.Provider value={[editMode, setEditMode]}>
-      <AuthContext.Provider value={[auth, dispatch]}>
-        <TopBar
-          currentCv={match.params.id}
-          search={location.search}
-          location={location}
-          match={match}
-        />
-        <CV currentCv={match.params.id} />
-      </AuthContext.Provider>
-    </EditModeContext.Provider>
+    <CvsContext.Provider value={[cvs, setCvs]}>
+      <EditModeContext.Provider value={[editMode, setEditMode]}>
+        <AuthContext.Provider value={[auth, dispatch]}>
+          <TopBar
+            currentCv={match.params.id}
+            search={location.search}
+            location={location}
+            match={match}
+          />
+          <CV currentCv={match.params.id} />
+        </AuthContext.Provider>
+      </EditModeContext.Provider>
+    </CvsContext.Provider>
   );
 };
 

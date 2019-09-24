@@ -4,15 +4,17 @@ import history from '../routers/history';
 
 import { makeStyles } from '@material-ui/core/styles';
 import Paper from '@material-ui/core/Paper';
+import Grid from '@material-ui/core/Grid';
 import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
-import { isUndefined } from 'util';
+import IconButton from '@material-ui/core/IconButton';
+import AddIcon from '@material-ui/icons/Add';
 
 const useStyles = makeStyles({
   root: { flexGrow: 1 }
 });
 
-const MenuTabs = ({ items, location, match }) => {
+const MenuTabs = ({ items, location, createItem }) => {
   const classes = useStyles();
   const [active, setActive] = useState(matchPathToActiveTab());
 
@@ -22,7 +24,7 @@ const MenuTabs = ({ items, location, match }) => {
 
   function handleChange(e, index) {
     setActive(index);
-    setTimeout(() => history.push(`/cvs/${items[index]._id}?edit=true`), 1);
+    history.push(`/cvs/${items[index]._id}?edit=true`);
   }
 
   function matchPathToActiveTab() {
@@ -38,17 +40,28 @@ const MenuTabs = ({ items, location, match }) => {
 
   return (
     <Paper className={classes.root}>
-      <Tabs
-        value={active}
-        onChange={handleChange}
-        indicatorColor="primary"
-        textColor="primary"
-        centered
-      >
-        {items.map((item, index) => (
-          <Tab value={index} label={item.title} key={item._id} />
-        ))}
-      </Tabs>
+      <Grid container justify="center">
+        <Tabs
+          value={active}
+          onChange={handleChange}
+          indicatorColor="primary"
+          textColor="primary"
+          centered
+        >
+          {items.map((item, index) => (
+            <Tab value={index} label={item.title} key={item._id} />
+          ))}
+        </Tabs>
+
+        <IconButton
+          aria-label="delete"
+          className={classes.margin}
+          aria-label="add new resume"
+          onClick={createItem}
+        >
+          <AddIcon color="primary" />
+        </IconButton>
+      </Grid>
     </Paper>
   );
 };

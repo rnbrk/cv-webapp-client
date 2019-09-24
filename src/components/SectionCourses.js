@@ -10,14 +10,14 @@ import ItemCourse from './ItemCourse';
 
 import useRequest from '../hooks/useRequest';
 import EditModeContext from '../contexts/editMode';
-import CvContext from '../contexts/cv';
+import CurrentCvContext from '../contexts/currentCv';
 import AuthContext from '../contexts/auth';
 
 export const sortByName = (a, b) => (a.name > b.name ? 1 : -1);
 
 const SectionCourses = ({ courses }) => {
   const [state, setState] = useState(courses);
-  const { requestUpdatesCvModel, currentCv } = useContext(CvContext);
+  const { requestUpdatesCvModel, currentCv } = useContext(CurrentCvContext);
   const [editMode] = useContext(EditModeContext);
   const [auth] = useContext(AuthContext);
   const [response, makeRequest] = useRequest(process.env.NODE_HOST);
