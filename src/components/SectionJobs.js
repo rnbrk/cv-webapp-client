@@ -1,9 +1,8 @@
 import React, { useContext, useState } from 'react';
 import PropTypes from 'prop-types';
 import Build from '@material-ui/icons/Build';
-import IconButton from '@material-ui/core/IconButton';
+import Button from '@material-ui/core/Button';
 import Grid from '@material-ui/core/Grid';
-import AddIcon from '@material-ui/icons/Add';
 import { withStyles } from '@material-ui/core/styles';
 
 import { compareDateRange } from '../utils/compare';
@@ -17,6 +16,7 @@ import ItemJob from './ItemJob';
 
 import CvContext from '../contexts/cv';
 import AuthContext from '../contexts/auth';
+import EditModeContext from '../contexts/editMode';
 
 const styles = {
   actionButton: {
@@ -30,6 +30,7 @@ const SectionJobs = ({ jobs, classes }) => {
   const { requestUpdatesCvModel, requestCreateJob, currentCv } = useContext(CvContext);
   const [response, makeRequest] = useRequest(process.env.NODE_HOST);
   const [auth] = useContext(AuthContext);
+  const [editMode] = useContext(EditModeContext);
 
   const createJob = async () => {
     const newJob = await makeRequest(`/cvs/${currentCv}/jobs`, 'POST', {
@@ -96,17 +97,19 @@ const SectionJobs = ({ jobs, classes }) => {
                 deleteJob={deleteJob}
               />
             ))}
-        <Grid justify="center" container>
-          <IconButton
-            color="secondary"
-            aria-label="add"
-            edge="start"
-            className={classes.actionButton}
-            onClick={createJob}
-          >
-            <AddIcon />
-          </IconButton>
-        </Grid>
+        {editMode ? (
+          <Grid justify="center" container>
+            <Button
+              variant="contained"
+              color="primary"
+              aria-label="Add new job"
+              onClick={createJob}
+              className={classes.button}
+            >
+              Add job
+            </Button>
+          </Grid>
+        ) : null}
       </StyledPaper>
     </section>
   );

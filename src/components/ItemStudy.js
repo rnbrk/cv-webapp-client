@@ -1,9 +1,13 @@
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import Grid from '@material-ui/core/Grid';
 import { withStyles } from '@material-ui/core/styles';
 
 import TitleItem from './TitleItem';
 import Timeline from './Timeline';
+import IconButton from '@material-ui/core/IconButton';
+import DeleteIcon from '@material-ui/icons/Delete';
+
+import EditModeContext from '../contexts/editMode';
 
 const styles = {
   totalItem: {
@@ -15,8 +19,9 @@ const styles = {
   }
 };
 
-const ItemStudy = ({ classes, study, setUpdates }) => {
+const ItemStudy = ({ classes, study, setUpdates, deleteStudy }) => {
   const [state, setState] = useState(study);
+  const [editMode] = useContext(EditModeContext);
 
   const update = (e, content, id) => {
     const newState = {
@@ -49,15 +54,29 @@ const ItemStudy = ({ classes, study, setUpdates }) => {
           dateFormat="YYYY"
           setUpdates={updateDates}
         />
-        <Grid item xs={10} className={classes.textPart}>
-          <TitleItem
-            title={state.name}
-            subtitle={state.instituteName}
-            titleName="name"
-            subtitleName="instituteName"
-            gutterBottom={false}
-            setUpdates={update}
-          />
+        <Grid item container xs={10}>
+          <Grid item xs={11} className={classes.textPart}>
+            <TitleItem
+              title={state.name}
+              subtitle={state.instituteName}
+              titleName="name"
+              subtitleName="instituteName"
+              gutterBottom={false}
+              setUpdates={update}
+            />
+          </Grid>
+
+          {editMode ? (
+            <Grid item xs={1}>
+              <IconButton
+                aria-label="delete"
+                className={classes.margin}
+                onClick={() => deleteStudy(study._id)}
+              >
+                <DeleteIcon color="error" />
+              </IconButton>
+            </Grid>
+          ) : null}
         </Grid>
       </Grid>
     </article>

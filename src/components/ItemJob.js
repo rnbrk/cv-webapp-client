@@ -1,5 +1,4 @@
 import React, { useContext, useState } from 'react';
-import uuid from 'uuid';
 
 import Grid from '@material-ui/core/Grid';
 import List from '@material-ui/core/List';
@@ -27,9 +26,10 @@ const styles = {
 };
 
 const ItemJob = ({ job, classes, timelineStyles, setUpdates, deleteJob }) => {
-  const [editMode] = useContext(EditModeContext);
-
   const [state, setState] = useState(job);
+  const [editMode] = useContext(EditModeContext);
+  
+
   const updateJob = (e, content, id) => {
     const newState = {
       ...state,
