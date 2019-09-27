@@ -7,13 +7,13 @@ import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
 import Typography from '@material-ui/core/Typography';
 
+import history from '../routers/history';
 import EditModeContext from '../contexts/editMode';
 import MenuTabs from './MenuTabs';
 import AuthContext from '../contexts/auth';
 import CvsContext from '../contexts/cvs';
 import useRequest from '../hooks/useRequest';
-import CurrentCvContext from '../contexts/currentCv';
-import { login, logout, createUser } from '../actions/auth';
+import { logout } from '../actions/auth';
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -28,7 +28,7 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-const TopBar = ({ currentCv, location, match }) => {
+const TopBar = ({ currentCv, location }) => {
   const [auth, dispatch] = useContext(AuthContext);
   const [editMode, setEditMode] = useContext(EditModeContext);
   const [cvs, setCvs] = useContext(CvsContext);
@@ -36,10 +36,7 @@ const TopBar = ({ currentCv, location, match }) => {
   const classes = useStyles();
   const [response, makeRequest] = useRequest(process.env.NODE_HOST);
 
-  const loginAction = () => dispatch(login({ email: 'ron@web.dev', password: '12345abc' }));
   const logoutAction = () => dispatch(logout());
-  const createUserAction = () =>
-    dispatch(createUser({ email: 'support@microsoft.com', password: 'b1llg4t3zZz' }));
 
   const createCv = async () => {
     const newCv = await makeRequest(`/cvs`, 'POST', {
@@ -49,6 +46,7 @@ const TopBar = ({ currentCv, location, match }) => {
     });
 
     setCvs(oldState => oldState.concat([newCv]));
+    history.push(`/cvs/${newCv._id}?edit=true`);
   };
 
   const ViewMode = props => (
@@ -61,22 +59,17 @@ const TopBar = ({ currentCv, location, match }) => {
         </Box>
       ) : (
         <Box>
-          <Button color="inherit" onClick={loginAction}>
+          <Button color="inherit" component={Link} to="/login">
             Log in
           </Button>
-          <Button color="inherit" onClick={createUserAction}>
+          <Button color="inherit" component={Link} to="/signup">
             Sign up
           </Button>
         </Box>
       )}
 
       {auth._id && (
-        <Button
-          component={Link}
-          to={`/cvs/${currentCv}?edit=true`}
-          color="secondary"
-          variant="contained"
-        >
+        <Button onClick={() => setEditMode(true)} color="secondary" variant="contained">
           Edit
         </Button>
       )}
@@ -86,17 +79,11 @@ const TopBar = ({ currentCv, location, match }) => {
   const EditMode = props => (
     <Box>
       <Box>
-        <Button
-          color="inherit"
-          component={Link}
-          to={`/cvs/${currentCv}`}
-          color="inherit"
-          onClick={logoutAction}
-        >
+        <Button color="inherit" color="inherit" onClick={logoutAction}>
           Log out
         </Button>
       </Box>
-      <Button component={Link} to={`/cvs/${currentCv}`} variant="contained" color="primary">
+      <Button onClick={() => setEditMode(false)} variant="contained" color="primary">
         View
       </Button>
     </Box>
@@ -105,7 +92,6 @@ const TopBar = ({ currentCv, location, match }) => {
   const EditModeMenuTabs = () => (
     <MenuTabs
       location={location}
-      match={match}
       items={cvs || []}
       initialValue={cvs || cvs.findIndex(cv => cv._id === currentCv)}
       createItem={createCv}

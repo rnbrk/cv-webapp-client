@@ -4,6 +4,8 @@ import Box from '@material-ui/core/Box';
 import Grid from '@material-ui/core/Grid';
 import Button from '@material-ui/core/Button';
 import Container from '@material-ui/core/Container';
+import TextField from '@material-ui/core/TextField';
+import GetAppRoundedIcon from '@material-ui/icons/GetAppRounded';
 import { withStyles } from '@material-ui/core/styles';
 
 import SectionProfile from '../components/SectionProfile';
@@ -17,6 +19,7 @@ import CurrentCvContext from '../contexts/currentCv';
 import EditModeContext from '../contexts/editMode';
 import CvsContext from '../contexts/cvs';
 import AuthContext from '../contexts/auth';
+import useCopyToClipboard from '../hooks/useCopyToClipboard';
 import { generateBlobURL } from '../utils/utils';
 
 const styles = {
@@ -35,9 +38,10 @@ const CV = ({ classes, currentCv }) => {
   const [editMode] = useContext(EditModeContext);
   const [cvs, setCvs] = useContext(CvsContext);
 
+  const copyUrl = useCopyToClipboard('Click to copy URL.', 'Copied URL!');
+
   const deleteCv = async () => {
     const newListOfCvs = cvs.filter(cv => cv._id !== currentCv);
-    const nextCvId = newListOfCvs[0]._id;
 
     await makeRequest(`/cvs/${currentCv}`, 'DELETE', {
       headers: {
@@ -46,7 +50,13 @@ const CV = ({ classes, currentCv }) => {
     });
 
     setCvs(newListOfCvs);
-    history.push(`/cvs/${nextCvId}?edit=true`);
+
+    if (newListOfCvs.length > 0) {
+      const nextCvId = newListOfCvs[0]._id;
+      history.push(`/cvs/${nextCvId}?edit=true`);
+    } else {
+      history.push('/');
+    }
   };
 
   const requestUpdatesCvModel = data => {
@@ -72,10 +82,15 @@ const CV = ({ classes, currentCv }) => {
   }, [currentCv]);
 
   useEffect(() => {
+    console.log('cvResponse.data', cvResponse.data);
+  }, [cvResponse.data]);
+
+  useEffect(() => {
+    console.log(cvResponse);
     let didCancel = false;
     const cleanUp = () => (didCancel = true);
 
-    if (cvResponse.status === 'SUCCESS') {
+    if (cvResponse.status === 'SUCCESS' && cvResponse.data.profile.hasPhoto) {
       fileRequest(
         `users/${cvResponse.data.user}/photo`,
         'GET',
@@ -96,8 +111,36 @@ const CV = ({ classes, currentCv }) => {
 
   return (
     <Container maxWidth="md">
+      {cvResponse.status === 'FETCHING' && <Loading />}
+
       {cvResponse.status === 'SUCCESS' && (
         <Box bgcolor="#EEEEEE" className={classes.root}>
+          {!editMode ? (
+            <React.Fragment>
+              <Button
+                variant="contained"
+                color="primary"
+                href={`${process.env.NODE_HOST}/cvs/${currentCv}/pdf`}
+                target="_blank"
+                download
+              >
+                Download as PDF
+                <GetAppRoundedIcon />
+              </Button>
+
+              <TextField
+                id="outlined-read-only-input"
+                defaultValue={`${location.protocol}//${location.host}${location.pathname}`}
+                margin="normal"
+                InputProps={{
+                  readOnly: true
+                }}
+                variant="outlined"
+                {...copyUrl}
+              />
+            </React.Fragment>
+          ) : null}
+
           <CurrentCvContext.Provider
             value={{ requestUpdatesCvModel, requestUpdatesUserModel, currentCv }}
           >
@@ -122,9 +165,7 @@ const CV = ({ classes, currentCv }) => {
         </Box>
       )}
 
-      {cvResponse.status === 'FETCHING' && <Loading />}
-
-      {cvResponse.status === 'LOADING' && <div>Error!</div>}
+      {cvResponse.status === 'ERROR' && <div>Error: could not load resume.</div>}
     </Container>
   );
 };

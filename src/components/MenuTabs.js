@@ -16,11 +16,13 @@ const useStyles = makeStyles({
 
 const MenuTabs = ({ items, location, createItem }) => {
   const classes = useStyles();
-  const [active, setActive] = useState(matchPathToActiveTab());
+  const [active, setActive] = useState(0);
 
   useEffect(() => {
-    setActive(active => matchPathToActiveTab());
-  }, [location.pathname]);
+    if (location && location.pathname) {
+      setActive(active => matchPathToActiveTab());
+    }
+  }, [location]);
 
   function handleChange(e, index) {
     setActive(index);

@@ -14,18 +14,20 @@ import { Redirect, Link } from 'react-router-dom';
 
 import AuthContext from '../contexts/auth';
 import useInputField from '../hooks/useInputField';
-import { login } from '../actions/auth';
+import { createUser } from '../actions/auth';
 
 const ScreenLogin = () => {
   const [auth, dispatch] = useContext(AuthContext);
 
+  const fullNameInput = useInputField('Full name');
   const emailInput = useInputField('Email address');
   const passwordInput = useInputField('Password');
 
   const handleSubmit = e => {
     e.preventDefault();
     dispatch(
-      login({
+      createUser({
+        fullName: fullNameInput.value,
         email: emailInput.value,
         password: passwordInput.value
       })
@@ -36,7 +38,7 @@ const ScreenLogin = () => {
     return <Redirect to="/" />;
   }
 
-  // TODO: What happens if user cannot login (invalid credentials)
+  // TODO: What happens when sign up does not work (User already exists)
 
   return (
     <Container component="main" maxWidth="xs">
@@ -46,9 +48,22 @@ const ScreenLogin = () => {
           <LockOutlinedIcon />
         </Avatar>
         <Typography component="h1" variant="h5">
-          Sign in
+          Create new user
         </Typography>
         <form noValidate onSubmit={handleSubmit}>
+          <TextField
+            variant="outlined"
+            margin="normal"
+            required
+            fullWidth
+            id="fullName"
+            label="Full name"
+            name="fullName"
+            autoFocus
+            {...fullNameInput}
+            disabled={auth.status === 'FETCHING'}
+          />
+
           <TextField
             variant="outlined"
             margin="normal"
@@ -86,17 +101,12 @@ const ScreenLogin = () => {
             color="primary"
             disabled={auth.status === 'FETCHING'}
           >
-            Log in
+            Sign up
           </Button>
           <Grid container>
-            <Grid item xs>
-              <a href="#" variant="body2">
-                Forgot password?
-              </a>
-            </Grid>
             <Grid item>
-              <Link to="/signup" variant="body2">
-                {"Don't have an account? Sign up."}
+              <Link to="/login" variant="body2">
+                {'Already have an account? Log in.'}
               </Link>
             </Grid>
           </Grid>

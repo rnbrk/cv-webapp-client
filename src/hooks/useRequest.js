@@ -43,7 +43,6 @@ const useRequest = (baseURL = '', cancel = () => {}) => {
     dispatch(fetching());
     try {
       const request = { baseURL, url, method, ...options };
-      console.log('request', request);
       const response = await axios(request);
 
       if (!cancel()) {
